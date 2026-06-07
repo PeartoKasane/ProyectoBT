@@ -1,0 +1,129 @@
+        :root {
+  --blancoPuro:   #ffffff;
+  --blancoCristal:#dceaf8;
+  --gris:         #c0c0c0;
+  --azulOscuro:   #1A3C52;
+  --rojoTeto:     #E30032;
+  --oscuro:       #4e5b64;
+  --medio:        #47606f;
+}
+
+body {
+  font-family: 'Barlow', sans-serif;
+  font-size: 16px;
+  line-height: 1.7;
+  color: var(--oscuro);
+  background-color: var(--gris);
+  max-width: 100%;
+  max-height: 100%;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    color: var(--oscuro);
+}
+
+.titulo {
+    display:flex;
+    justify-content: flex-end;
+}
+
+.logo {
+    display:flex;
+    justify-content: flex-end;
+    display: inline-block;
+    max-width: 160px;
+    max-height: 160px;
+}
+
+.navegacion {
+    display: flex;
+    justify-content: center;
+}
+
+
+header h1,
+header nav {
+  display: inline;
+}
+
+nav ul,
+nav li {
+  display: inline;
+}
+
+nav ul,
+.listaProductos {
+  list-style-type: none;
+}
+
+.botonNavegacion {
+  text-decoration: none;
+  background-color: var(--oscuro);
+  color: var(--blancoPuro);
+  font-family: 'Barlow', sans-serif;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.botonNavegacion:hover {
+  background-color: var(--rojoTeto);
+  color: var(--oscuro);
+}
+
+.botonNavegacion:focus {
+  background-color: var(--rojoTeto);
+  color: var(--oscuro);
+}
+
+section {
+  background-color: var(--blancoPuro);
+}
+
+table {
+  border-collapse: collapse;
+  font-size: 15px;
+}
+
+caption {
+  font-weight: bold;
+}
+
+th {
+  background-color: var(--oscuro);
+  color: var(--blancoPuro);
+  text-align: left;
+}
+
+tr:nth-child(even) td {
+  background-color: #e8e8e8;
+}
+
+footer {
+    background-color: var(--azulOscuro);
+    color: var(--blancoPuro);
+    font-family: 'Barlow', sans-serif;
+    font-size: 15px;
+    line-height: 1.6;
+    text-align: center;
+    min-height: 80px;
+}
+
+footer address {
+    font-style: normal;
+}
+
+footer a {
+    color: var(--blancoPuro);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+footer a:hover,
+footer a:focus {
+    color: var(--rojoTeto);
+    text-decoration: underline;
+}
+
+footer a:active {
+    color: var(--gris);
+}
