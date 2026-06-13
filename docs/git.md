@@ -1,33 +1,41 @@
-# Gestión del repositorio
+# Gestión del repositorio Git
 
 ## Manejador utilizado
 
-Se utilizó Git como sistema de control de versiones y GitHub como plataforma de almacenamiento remoto debido a que permite mantener un historial de cambios, trabajar mediante ramas y facilitar la colaboración entre integrantes.
+Para el control de versiones del proyecto se utiliza Git como sistema de control distribuido y GitHub como repositorio remoto.
 
-## Convención de commits
+La elección se debe a que permite mantener un historial de cambios, trabajar con ramas independientes y facilitar la colaboración entre integrantes del equipo.
 
-Los commits siguen la siguiente estructura:
+## Convenciones de commits
+
+Los mensajes de commit siguen una convención basada en el tipo de cambio realizado:
 
 ### feat: 
-nuevas funcionalidades
+incorporación de nuevas funcionalidades.
 ### fix: 
-correcciones
+corrección de errores.
 ### docs: 
-documentación
+modificaciones relacionadas con documentación.
 ### style: 
-estilos
+cambios de estilos o interfaz.
 ### refactor: 
-reorganización
+reorganización del código sin modificar funcionalidades.
 ### chore: 
-configuración
+tareas de configuración o mantenimiento.
+
 
 ## Estrategia de ramas
 
-### main:
-Contiene la versión estable del proyecto.
+Se utiliza una rama principal llamada main, destinada a contener versiones estables del proyecto.
 
-## frontend-js:
-Contiene el desarrollo de HTML, CSS y JavaScript.
+Además se utilizan ramas de desarrollo separadas según las responsabilidades:
 
-## documentacion-persistencia:
-Contiene documentación, modelo de datos y configuración del repositorio.
+### frontend-js:
+Contiene la implementación de HTML, CSS y JavaScript.
+
+### documentacion-persistencia:
+Contiene documentación del proyecto, configuración del repositorio y elementos relacionados con persistencia.
+
+## Versionado
+
+El proyecto utiliza etiquetas para identificar versiones importantes del sistema.
