@@ -25,3 +25,12 @@ SGRSI es un sistema orientado a la gestión de recursos y soporte informático, 
 - Coordinador: Ismael Terra
 - Subcoordinador: Francisco Vázquez
 
+## Documentación
+
+La documentación del proyecto se encuentra organizada en la carpeta `docs`.
+
+Incluye:
+
+- `descripcion-proyecto.md`: descripción general, objetivos y tecnologías utilizadas.
+- `requerimientos.md`: requerimientos funcionales y no funcionales del sistema.
+- `git.md`: convenciones de commits, estrategia de ramas y gestión del repositorio.
