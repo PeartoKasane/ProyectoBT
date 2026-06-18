@@ -4,8 +4,124 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Docentes</title>
+    <link rel="stylesheet" href="assets/css/global.css">
 </head>
-<body>
-<h1>Hello To The Planilla, YEAH!</h1>
+
+<body class="centrado">
+    <header class="header">
+        <nav class="nav">
+            <ul class="nav-list">
+                <li><a href="Login.html">Cerrar Sesión</a></li>
+            </ul>
+        </nav>
+    </header>
+
+<h1 class="h1">PLANILLA DE REGISTRO DE USO DE SALA DE INFORMÁTICA</h1><br><br>
+<form class="form-contenedor">
+        <fieldset class="form-fieldset">
+
+            <section class="caja-generica">
+                <label for="tipo_sala" class="form-label">Tipo de Sala:</label>
+                <select id="tipo_sala" name="tipo_sala" class="form-select" onchange="Type()" required>
+                    <option value="">-- Seleccione --</option>
+                    <option value="laboratorio">Laboratorio</option>
+                    <option value="taller">Taller</option>
+                </select>
+
+                <label for="num_sala" class="form-label">Número:</label>
+                <select id="num_sala" name="num_sala" class="form-select" disabled required>
+                    <option value="">-- Elija primero el tipo --</option>
+                </select>
+            </section>
+
+            <section class="caja-fecha/hora">
+                <span class="cajitas">
+                    <label for="fecha" class="form-label">Fecha:</label>
+                    <input type="date" id="fecha" name="fecha" class="form-input" required>
+                </span>
+                <span class="cajitas">
+                    <label for="hora_entrada" class="form-label">Hora Entrada:</label>
+                    <input type="time" id="hora_entrada" name="hora_entrada" class="form-input" required>
+                </span>
+                <span class="cajitas">
+                    <label for="hora_salida" class="form-label">Hora Salida:</label>
+                    <input type="time" id="hora_salida" name="hora_salida" class="form-input" required>
+                </span>
+
+                <span class="fila">
+                    <label for="asignatura" class="form-label">Asignatura:</label>
+                    <input type="text" id="asignatura" name="asignatura" class="form-input" required>
+                </span>
+                <span class="fila">
+                    <label for="docente" class="form-label">Docente:</label>
+                    <input type="text" id="docente" name="docente" class="form-input" required>
+                </span>
+            </section>
+
+            <section class="caja-grupo/turno">
+                <label for="grupo" class="form-label">Grupo:</label>
+                <input type="text" id="grupo" name="grupo" class="form-input" placeholder="Indique el grupo" required>
+
+                <label for="turno" class="form-label">Turno:</label>
+                <select id="turno" name="turno" class="form-select" required>
+                    <option value="">-- Turno --</option>
+                    <option value="M">M (Matutino)</option>
+                    <option value="V">V (Vespertino)</option>
+                    <option value="N">N (Nocturno)</option>
+                </select>
+            </section>
+        
+        </fieldset>
+
+            <section class="tabla">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>N° equipo</th>
+                            <th>Nombre y Apellido</th>
+                            <th>Estado del Equipo</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="registro_salas">
+                        <tr>
+                            <td>1</td>
+                            <td>Francisco Váquez</td>
+                            <td>Andando</td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>José Piñeyro</td>
+                            <td>Todo OK</td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td>Salvador Rodriguez</td>
+                            <td>No prende</td>
+                        </tr>
+                        <tr>
+                            <td>4</td>
+                            <td>Ismael Terra</td>
+                            <td>Teclado roto</td>
+                        </tr>
+                        <tr>
+                            <td>5</td>
+                            <td>Carlos Mendoza</td>
+                            <td>En buen estado</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+        <section class="form-btn">
+            <button type="button" onclick="location.href='NeedApp.html'">Necesito un Programa</button> <br><br>
+            <button type="submit">Generar Ticket</button>
+        </section>
+    </form>
+
+    <footer class="footer">
+        <p>&copy; 2026 I.T.I</p>
+    </footer>
+
+    <script src="assets/js/SelectSala.js"></script>
 </body>
 </html>
