@@ -1,19 +1,34 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
+    <link rel="stylesheet" href="assets/css/global.css">
 </head>
-<body>
-    <h1>Bienvenido/a A SGRSI</h1>
+<body class="centrado">
+    <h1 class="h1">Bienvenido/a a SGRSI</h1>
     <p>Por favor, ingresa tus credenciales para iniciar sesión.</p>
-    <form action="Docente.html" method="post">
-        <label for="username">Usuario:</label>
-        <input type="text" id="username" name="username" required><br><br>
-        <label for="password">Contraseña:</label>
-        <input type="password" id="password" name="password" required><br><br>
-        <button type="submit">Iniciar Sesión</button>
+    
+    <form id="form-login" class="form-contenedor">
+        <fieldset class="form-fieldset">
+            
+            <section class="caja-generica" style="width: 250px; gap: 12px;">
+                <label for="ci" class="form-label">C.I:</label>
+                <input type="text" id="ci" name="ci" class="form-input" required>
+                
+                <label for="contrasena" class="form-label">Contraseña:</label>
+                <input type="password" id="contrasena" name="contrasena" class="form-input" required>
+                
+                <button type="submit" class="form-input" style="margin-top: 10px; background-color: #000; color: #fff; cursor: pointer; font-weight: bold;">Iniciar Sesión</button>
+            </section>
+        </fieldset>
     </form>
+
+    <footer class="footer">
+        <p>&copy; 2026 I.T.I</p>
+    </footer>
+
+    <script src="assets/js/Login.js"></script>
 </body>
-</html> 
+</html>
