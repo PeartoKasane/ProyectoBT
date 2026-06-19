@@ -1,5 +1,5 @@
 # SGRSI
-## Sistema de Gestión y Recursos de Soporte Informático
+## Sistema de Gestión y Recursos de Soporte Informático.
 
 ## Descripción
 
