@@ -18,4 +18,5 @@ function Type() {
         numSala.disabled = true;
         numSala.innerHTML = '<option value="">-- Elija primero el tipo --</option>';
     }
+    
 }
