@@ -13,4 +13,5 @@ document.getElementById("form-login").addEventListener("submit", function(event)
     } else {
         alert("Cédula o contraseña incorrectas. Intente nuevamente.");
     }
+    
 });
