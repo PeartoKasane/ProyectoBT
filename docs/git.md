@@ -6,7 +6,7 @@ Se utilizó Git como sistema de control de versiones y GitHub como plataforma de
 
 ## Convención de commits
 
-Los commits siguen la siguiente estructura:
+Los commits siguen la siguiente estructura: 
 
 ### feat: 
 nuevas funcionalidades
