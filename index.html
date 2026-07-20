@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LabCheck</title>
+    <link rel="stylesheet" href="assets/css/global.css">
+    <link rel="stylesheet" href="assets/css/login.css">
+</head>
+<body>
+ <header>
+    <h1>Bienvenido a LabCheck</h1>
+    <p>Tu herramienta de monitoreo de laboratorios</p>
+ </header>
+
+<section class="contenedorLogin">
+    <h2 class="TituloInicio">Iniciar sesión</h2> 
+    
+    <form id="formLogin" action="administrador.html" method="post">
+      <fieldset>
+        <label for="cedulaAdmin">Cédula:</label>
+        <input type="number" id="cedulaAdmin" min="1000000" required><br><br>
+        
+        <label for="passAdmin">Contraseña:</label>
+        <input type="password" id="passAdmin" minlength="8" required>
+        
+        <input type="checkbox" id="verPass">
+        <label for="verPass">Mostrar contraseña</label><br><br>
+      </fieldset>        
+        <button type="submit">Ingresar</button>
+    </form>
+    
+</section>
+<footer>
+    <p>© 2026 Pearto S.A</p>
+</footer>
+<script src="JS/loginadmin.js"></script>
+</body>
+</html>
