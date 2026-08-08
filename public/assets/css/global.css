@@ -164,3 +164,33 @@ body {
     height: 100%;
     justify-content: space-between;
 }
+
+
+@media (max-width: 1024px) {
+
+    .container {
+        max-width: 95%;
+    }
+
+    h1.display-6 {
+        font-size: 1.8rem;
+    }
+
+    .navbar-brand {
+        font-size: 1rem;
+    }
+
+    .table th,
+    .table td {
+        font-size: 12px;
+        padding: 6px;
+    }
+}
+
+
+@media (min-width: 1025px) {
+
+    .container {
+        max-width: 1200px;
+    }
+}
