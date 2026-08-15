@@ -17,6 +17,14 @@ CREATE TABLE usuarios (
     unique (documento)
 ) ENGINE=InnoDB;
 
+--Tabla de Laboratorios
+CREATE TABLE laboratorios (
+    id_laboratorio INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(50) NOT NULL, -- Ej: Lab A, Salón 105
+    ubicacion VARCHAR(100),
+    estado_salon ENUM('activo', 'mantenimiento', 'inactivo') DEFAULT 'activo'
+) ENGINE=InnoDB;
+
 /*
 CREATE TABLE USUARIO (
     cedula CHAR(8) NOT NULL,
