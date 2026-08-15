@@ -58,6 +58,26 @@ CREATE TABLE registro_uso_equipos (
     FOREIGN KEY (id_equipo) REFERENCES equipos(id_equipo) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
+--Tabla de Tickets
+CREATE TABLE Ticket (
+    id_ticket INT AUTO_INCREMENT PRIMARY KEY,
+    id_usuario_reporta INT NOT NULL,
+    id_tecnico_asignado INT, 
+    id_equipo_afectado INT, 
+    id_laboratorio_afectado INT, 
+    titulo VARCHAR(100) NOT NULL,
+    descripcion TEXT NOT NULL,
+    fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    fecha_resolucion DATETIME,
+    -- Estados del ticket
+    estado ENUM('enviado', 'leido', 'sin_asignar', 'en_proceso', 'resuelto') DEFAULT 'enviado',
+    gravedad ENUM('baja', 'media', 'alta', 'critica') DEFAULT 'media',
+    FOREIGN KEY (id_usuario_reporta) REFERENCES usuarios(documento) ON DELETE SET NULL,
+    FOREIGN KEY (id_tecnico_asignado) REFERENCES usuarios(documento) ON DELETE SET NULL,
+    FOREIGN KEY (id_equipo_afectado) REFERENCES equipos(id_equipo) ON DELETE SET NULL,
+    FOREIGN KEY (id_laboratorio_afectado) REFERENCES laboratorios(id_laboratorio) ON DELETE SET NULL
+) ENGINE=InnoDB;
+
 /*
 CREATE TABLE USUARIO (
     cedula CHAR(8) NOT NULL,
