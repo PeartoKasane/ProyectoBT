@@ -49,6 +49,14 @@ CREATE TABLE reservas (
     FOREIGN KEY (id_laboratorio) REFERENCES laboratorios(id_laboratorio)
 ) ENGINE=InnoDB;
 
+--registro de quién utilizó cada máquina
+CREATE TABLE registro_uso_equipos (
+    id_reserva INT NOT NULL,
+    id_equipo INT NOT NULL,
+    PRIMARY KEY (id_reserva, id_equipo),
+    FOREIGN KEY (id_reserva) REFERENCES reservas(id_reserva) ON DELETE CASCADE,
+    FOREIGN KEY (id_equipo) REFERENCES equipos(id_equipo) ON DELETE CASCADE
+) ENGINE=InnoDB;
 
 /*
 CREATE TABLE USUARIO (
