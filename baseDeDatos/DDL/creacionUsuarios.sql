@@ -36,7 +36,18 @@ CREATE TABLE equipos (
     FOREIGN KEY (id_laboratorio_actual) REFERENCES laboratorios(id_laboratorio) ON DELETE SET NULL
 ) ENGINE=InnoDB;
 
-
+--Tabla de Préstamos
+CREATE TABLE reservas (
+    id_reserva INT AUTO_INCREMENT PRIMARY KEY,
+    id_docente INT NOT NULL,
+    id_laboratorio INT NOT NULL,
+    fecha_hora_inicio DATETIME NOT NULL,
+    fecha_hora_fin DATETIME NOT NULL,
+    observaciones TEXT,
+    estado_reserva ENUM('confirmada', 'en_curso', 'finalizada', 'cancelada') DEFAULT 'confirmada',
+    FOREIGN KEY (id_docente) REFERENCES usuarios(documento),
+    FOREIGN KEY (id_laboratorio) REFERENCES laboratorios(id_laboratorio)
+) ENGINE=InnoDB;
 
 
 /*
