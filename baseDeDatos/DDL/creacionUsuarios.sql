@@ -2,6 +2,22 @@
     Espacio donde se deberán colocar todas las sentencias utilizadas para crear las tablas.
 */
 
+
+ --tabla de usuarios
+CREATE TABLE usuarios (
+    documento INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(50) NOT NULL,
+    apellido VARCHAR(50) NOT NULL,
+    email VARCHAR(100) NOT NULL UNIQUE,
+     claveHash VARCHAR(255) NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    rol ENUM('administrador','docente','direccion') NOT NULL,
+    fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    UNIQUE (email)
+    unique (documento)
+) ENGINE=InnoDB;
+
+/*
 CREATE TABLE USUARIO (
     cedula CHAR(8) NOT NULL,
     nombre VARCHAR(50) NOT NULL,
