@@ -25,6 +25,20 @@ CREATE TABLE laboratorios (
     estado_salon ENUM('activo', 'mantenimiento', 'inactivo') DEFAULT 'activo'
 ) ENGINE=InnoDB;
 
+--Tabla de Equipos
+CREATE TABLE equipos (
+    id_equipo INT AUTO_INCREMENT PRIMARY KEY,
+    marca VARCHAR(50),
+    modelo VARCHAR(50),
+    nro_serie VARCHAR(100) UNIQUE,
+    estado_hardware ENUM('funcional', 'en_reparacion','critico') DEFAULT 'funcional',
+    id_laboratorio_actual INT,
+    FOREIGN KEY (id_laboratorio_actual) REFERENCES laboratorios(id_laboratorio) ON DELETE SET NULL
+) ENGINE=InnoDB;
+
+
+
+
 /*
 CREATE TABLE USUARIO (
     cedula CHAR(8) NOT NULL,
