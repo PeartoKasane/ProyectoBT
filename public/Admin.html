@@ -35,13 +35,12 @@
                     <table class="table table-striped table-hover align-middle m-0">
                         <thead class="table-dark text-center">
                             <tr>
-                                <th scope="col" style="width: 15%;">Prioridad</th>
+                                <th scope="col" class="col-prioridad">Prioridad</th>
                                 <th scope="col">Pendiente</th>
                                 <th scope="col">Realizado</th>
                             </tr>
                         </thead>
                         <tbody id="registro_tickets" class="text-center">
-                            
                         </tbody>
                     </table>
                 </div>
@@ -72,7 +71,31 @@
     <footer class="w-100 bg-secondary text-white text-center py-3">
        <p class="m-0 small">&copy; 2026 I.T.I</p>
     </footer>
-    <script src="assets/js/Admin.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+   <!-- Modelo que representa los equipos -->
+<script src="assets/js/modelos/equipo.js"></script>
+
+<!-- Modelo que representa los tickets -->
+<script src="assets/js/modelos/ticket.js"></script>
+
+<!-- Gestión del almacenamiento de tickets -->
+<script src="assets/js/storage/ticketStorage.js"></script>
+
+<!-- Lógica relacionada con los tickets -->
+<script src="assets/js/servicios/ticketServicio.js"></script>
+
+<!-- Vista de la página de administración -->
+<script src="assets/js/vistas/adminVista.js"></script>
+
+<!-- Controlador de la página de administración -->
+<script src="assets/js/controladores/adminControlador.js"></script>
+
+<!-- JavaScript de Bootstrap -->
+<script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+    crossorigin="anonymous">
+</script>
+<!-- Comentario: script de Bootstrap incluido una sola vez -->
 </body>
 </html>

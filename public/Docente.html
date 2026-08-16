@@ -33,7 +33,7 @@
                 <div class="col-12 col-md-3">
                     <div class="mb-3">
                         <label for="tipo_sala" class="form-label fw-semibold text-secondary">Tipo de Sala:</label>
-                        <select id="tipo_sala" name="tipo_sala" class="form-select" onchange="Type()" required>
+                        <select id="tipo_sala">
                             <option value="">-- Seleccione --</option>
                             <option value="laboratorio">Laboratorio</option>
                             <option value="taller">Taller</option>
@@ -411,7 +411,22 @@
         <p class="m-0 small">&copy; 2026 I.T.I</p>
     </footer>
 
-    <script src="assets/js/Docente.js"></script>
+    <!-- Modelos -->
+    <script src="assets/js/modelos/equipo.js"></script>
+    <script src="assets/js/modelos/ticket.js"></script>
+
+    <!-- Storage -->
+    <script src="assets/js/storage/ticketStorage.js"></script>
+
+    <!-- Servicios -->
+    <script src="assets/js/servicios/incidenciaServicio.js"></script>
+    <script src="assets/js/servicios/ticketServicio.js"></script>
+
+    <!-- Vistas y controladores -->
+    <script src="assets/js/vistas/docenteVista.js"></script>
+    <script src="assets/js/controladores/docenteControlador.js"></script>
+
+    <!-- Funcionalidad auxiliar -->
     <script src="assets/js/SelectSala.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </body>

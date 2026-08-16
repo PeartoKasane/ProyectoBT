@@ -194,3 +194,8 @@ body {
         max-width: 1200px;
     }
 }
+
+/* Define el ancho de la columna de prioridad de los tickets. */
+.col-prioridad {
+    width: 15%;
+}
