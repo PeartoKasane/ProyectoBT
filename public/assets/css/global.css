@@ -195,6 +195,34 @@ body {
     }
 }
 
+.tablaContenedor {
+    border: 1px solid #e5e7eb;
+}
+
+.botonCambiarEstado {
+    min-width: 220px;
+}
+
+.modalTicket {
+    z-index: 1060;
+}
+
+.infoTicket {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 0.9rem;
+}
+
+.datosTicket {
+    word-break: break-word;
+    line-height: 1.4;
+}
+
+.botonEliminar {
+    font-weight: 600;
+}
+
 /* Define el ancho de la columna de prioridad de los tickets. */
 .col-prioridad {
     width: 15%;

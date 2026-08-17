@@ -26,19 +26,50 @@
             </div>
         </header>
 
-        <form class="bg-white p-4 rounded shadow-sm border-0">
-            
-            <section class="row mb-4" aria-label="Detalle de la solicitud">
+        <form id="form-solicitud-programa" class="bg-white p-4 rounded shadow-sm border-0">
+            <div class="alert alert-secondary d-none" id="mensajeSolicitudPrograma" role="alert"></div>
+
+            <section class="row g-3 mb-4" aria-label="Datos de la solicitud">
+                <div class="col-12 col-md-6">
+                    <label for="docentePrograma" class="form-label fw-semibold text-secondary">Nombre del docente:</label>
+                    <input type="text" id="docentePrograma" class="form-control" placeholder="Ej: Ana Gómez" required>
+                </div>
+                <div class="col-12 col-md-6">
+                    <label for="laboratorioPrograma" class="form-label fw-semibold text-secondary">Laboratorio o sala:</label>
+                    <select id="laboratorioPrograma" class="form-select" required>
+                        <option value="">-- Seleccione --</option>
+                        <option value="Laboratorio 1">Laboratorio 1</option>
+                        <option value="Laboratorio 2">Laboratorio 2</option>
+                        <option value="Laboratorio 3">Laboratorio 3</option>
+                        <option value="Sala de informática">Sala de informática</option>
+                    </select>
+                </div>
+
                 <div class="col-12">
-                    <label for="programa" class="form-label h5 fw-bold text-dark mb-3">¿Qué programa necesita?</label>
-                    <textarea id="programa" name="programa" class="form-control p-3 text-muted" rows="5" placeholder="Soy el docente... y necesito... para el lab... en todas las computadoras para el día... ." required></textarea>
+                    <label for="programaNecesitado" class="form-label fw-semibold text-secondary">Programa que necesita:</label>
+                    <input type="text" id="programaNecesitado" class="form-control" placeholder="Ej: Python, Visual Studio Code, Adobe Photoshop" required>
+                </div>
+
+                <div class="col-12">
+                    <label for="detallePrograma" class="form-label fw-semibold text-secondary">Descripción o detalle:</label>
+                    <textarea id="detallePrograma" class="form-control" rows="4" placeholder="Describa qué necesita instalar, configurar o preparar para el laboratorio." required></textarea>
+                </div>
+
+                <div class="col-12 col-md-6">
+                    <label for="fechaPrograma" class="form-label fw-semibold text-secondary">Fecha:</label>
+                    <input type="date" id="fechaPrograma" class="form-control" required>
+                </div>
+
+                <div class="col-12 col-md-6">
+                    <label for="horaPrograma" class="form-label fw-semibold text-secondary">Hora:</label>
+                    <input type="time" id="horaPrograma" class="form-control" required>
                 </div>
             </section>
 
             <section class="row justify-content-center" aria-label="Acciones del formulario">
                 <div class="col-auto">
                     <button type="submit" class="btn btn-dark fw-semibold shadow-sm px-5 py-2">
-                        Generar Ticket
+                        Enviar solicitud
                     </button>
                 </div>
             </section>
@@ -50,6 +81,11 @@
         <p class="m-0 small">&copy; 2026 I.T.I</p>
     </footer>
 
+    <script src="assets/js/modelos/solicitudPrograma.js"></script>
+    <script src="assets/js/storage/solicitudProgramaStorage.js"></script>
+    <script src="assets/js/servicios/solicitudProgramaServicio.js"></script>
+    <script src="assets/js/vistas/solicitudProgramaVista.js"></script>
+    <script src="assets/js/controladores/solicitudProgramaControlador.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </body>
 </html>

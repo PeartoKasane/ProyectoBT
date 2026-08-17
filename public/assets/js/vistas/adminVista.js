@@ -1,14 +1,10 @@
 class AdminVista {
 
-    // Obtiene la tabla donde se muestran los tickets.
     static obtenerTabla() {
         return document.getElementById("registro_tickets");
     }
 
-    // Determina la clase CSS correspondiente
-    // al nivel de prioridad del ticket.
     static obtenerClasePrioridad(prioridad) {
-
         if (prioridad === 0) {
             return "bg-danger";
         }
@@ -20,85 +16,118 @@ class AdminVista {
         return "bg-secondary";
     }
 
-    // Genera el contenido HTML correspondiente
-    // a las incidencias asociadas al ticket.
-    static generarIncidencias(incidencias) {
+    static obtenerSala(ticket) {
+        const tipoSala = ticket?.tipoSala || "";
+        const numeroSala = ticket?.numeroSala || "";
 
-        if (incidencias.length === 0) {
-            return "Sin incidencias registradas";
+        if (tipoSala && numeroSala) {
+            return `${tipoSala} ${numeroSala}`;
         }
 
-        return incidencias.map(equipo => `
-            <div>
-                Equipo ${equipo.numero}:
-                ${equipo.estudiante} -
-                ${equipo.incidencia}
+        if (numeroSala) {
+            return numeroSala;
+        }
+
+        return "Sin sala";
+    }
+
+    static obtenerEstadoClase(estado) {
+        const estadoNormalizado = TicketServicio.normalizarEstado(estado);
+
+        if (estadoNormalizado === "Terminado") {
+            return "bg-success";
+        }
+
+        if (estadoNormalizado === "En proceso") {
+            return "bg-primary";
+        }
+
+        if (estadoNormalizado === "Evaluando") {
+            return "bg-info text-dark";
+        }
+
+        return "bg-secondary";
+    }
+
+    static generarDetalleTicket(ticket) {
+        const incidencias = TicketServicio.obtenerIncidencias(ticket);
+        const descripcion = TicketServicio.obtenerIncidenciasTexto(ticket);
+        const estudiantes = TicketServicio.obtenerEstudiantesTexto(ticket);
+
+        return `
+            <div class="infoTicket text-start">
+                <div class="datosTicket"><strong>Incidencia:</strong> ${descripcion}</div>
+                <div class="datosTicket"><strong>Estudiante:</strong> ${estudiantes}</div>
+                <div class="datosTicket"><strong>ID:</strong> #${ticket.id}</div>
+                <button type="button" class="botonEliminar btn btn-link btn-sm text-danger p-0 mt-2" data-ticket-id="${ticket.id}" aria-label="Eliminar ticket ${ticket.id}">
+                    Eliminar
+                </button>
             </div>
+        `;
+    }
+
+    static rellenarSelectorTicket(tickets) {
+        const select = document.getElementById("ticketSeleccionado");
+
+        if (!select) {
+            return;
+        }
+
+        const lista = Array.isArray(tickets) ? tickets : [];
+
+        select.innerHTML = `<option value="">Selecciona un ticket</option>` + lista.map(ticket => `
+            <option value="${ticket.id}">${ticket.id} - ${this.obtenerSala(ticket)}</option>
         `).join("");
     }
 
-    // Muestra todos los tickets almacenados
-    // en la tabla del administrador.
-    static mostrarTickets(tickets) {
+    static actualizarEstadoActual(ticketId) {
+        const estadoActual = document.getElementById("estadoActual");
+        if (!estadoActual) {
+            return;
+        }
 
+        const ticket = TicketStorage.buscarTicketPorId(ticketId);
+        estadoActual.textContent = ticket ? TicketServicio.normalizarEstado(ticket.estado) : "Sin ticket seleccionado";
+    }
+
+    static mostrarTickets(tickets) {
         const tabla = this.obtenerTabla();
 
-        // Elimina las filas de prueba que estaban
-        // escritas directamente en el HTML.
+        if (!tabla) {
+            return;
+        }
+
         tabla.innerHTML = "";
 
-        // Recorre todos los tickets almacenados.
-        tickets.forEach(ticket => {
+        const lista = Array.isArray(tickets) ? tickets : [];
 
-            // Obtiene la prioridad del ticket.
-            const prioridad =
-                Number(TicketServicio.obtenerPrioridad(ticket));
-
-            // Obtiene las incidencias del ticket.
-            const incidencias =
-                TicketServicio.obtenerIncidencias(ticket);
-
-            // Genera el contenido de las incidencias.
-            const contenidoIncidencias =
-                this.generarIncidencias(incidencias);
-
-            // Obtiene la clase visual correspondiente
-            // a la prioridad.
-            const clasePrioridad =
-                this.obtenerClasePrioridad(prioridad);
-
-            // Comprueba el estado del ticket.
-            const pendiente =
-                TicketServicio.debeMostrarComoPendiente(ticket);
-
-            const realizado =
-                TicketServicio.debeMostrarComoRealizado(ticket);
-
-            // Agrega una fila manteniendo siempre
-            // el orden: Prioridad, Pendiente, Realizado.
-            tabla.innerHTML += `
+        if (lista.length === 0) {
+            tabla.innerHTML = `
                 <tr>
-
-                    <td>
-                        <span class="badge ${clasePrioridad} fs-6 px-3">
-                            ${prioridad}
-                        </span>
-                    </td>
-
-                    <td class="fw-semibold">
-                        ${pendiente
-                            ? contenidoIncidencias
-                            : "---"}
-                    </td>
-
-                    <td class="fw-semibold">
-                        ${realizado
-                            ? contenidoIncidencias
-                            : "---"}
-                    </td>
-
+                    <td colspan="4" class="text-muted py-4">No hay tickets registrados.</td>
                 </tr>
             `;
-        });
+            return;
+        }
+
+        tabla.innerHTML = lista.map(ticket => {
+            const prioridad = Number(TicketServicio.obtenerPrioridad(ticket));
+            const clasePrioridad = this.obtenerClasePrioridad(prioridad);
+            const estado = TicketServicio.normalizarEstado(ticket.estado);
+            const claseEstado = this.obtenerEstadoClase(estado);
+
+            return `
+                <tr data-ticket-id="${ticket.id}">
+                    <td class="fw-semibold">${this.obtenerSala(ticket)}</td>
+                    <td class="fw-semibold">${this.generarDetalleTicket(ticket)}</td>
+                    <td>
+                        <span class="badge ${clasePrioridad} fs-6 px-3">${prioridad}</span>
+                    </td>
+                    <td>
+                        <span class="badge ${claseEstado} fs-6 px-3">${estado}</span>
+                    </td>
+                </tr>
+            `;
+        }).join("");
     }
 }

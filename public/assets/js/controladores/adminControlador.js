@@ -1,12 +1,98 @@
-// Espera a que todo el documento HTML haya sido cargado
-// antes de empezar a mostrar los tickets.
 document.addEventListener("DOMContentLoaded", () => {
+    const tabla = document.getElementById("registro_tickets");
+    const modalEstado = document.getElementById("modal-cambiar-estado");
+    const ticketSeleccionado = document.getElementById("ticketSeleccionado");
+    const nuevoEstado = document.getElementById("nuevoEstado");
+    const formularioEstado = document.getElementById("form-cambiar-estado");
 
-    // Obtiene todos los tickets almacenados.
-    const tickets =
-        TicketStorage.obtenerTickets();
+    function recargarTabla() {
+        AdminVista.mostrarTickets(TicketStorage.obtenerTickets());
+    }
 
-    // Envía los tickets a la vista para que
-    // sean representados en la tabla.
-    AdminVista.mostrarTickets(tickets);
+    function prepararModalEstado() {
+        // Volvemos a cargar los tickets para que el modal
+        // muestre siempre lo que está guardado.
+        AdminVista.rellenarSelectorTicket(TicketStorage.obtenerTickets());
+        const actual = document.getElementById("estadoActual");
+        if (actual) {
+            actual.textContent = "Sin ticket seleccionado";
+        }
+        if (ticketSeleccionado) {
+            ticketSeleccionado.value = "";
+        }
+        if (nuevoEstado) {
+            nuevoEstado.value = "Pendiente";
+        }
+    }
+
+    // Cargamos la tabla con los tickets actuales.
+    recargarTabla();
+
+    // Cuando se abre el modal, se recargan los tickets disponibles.
+    if (modalEstado) {
+        modalEstado.addEventListener("show.bs.modal", prepararModalEstado);
+    }
+
+    if (ticketSeleccionado) {
+        ticketSeleccionado.addEventListener("change", function () {
+            AdminVista.actualizarEstadoActual(this.value);
+        });
+    }
+
+    if (formularioEstado) {
+        formularioEstado.addEventListener("submit", function (event) {
+            event.preventDefault();
+
+            const idTicket = ticketSeleccionado.value;
+            const estadoNuevo = nuevoEstado.value;
+
+            if (!idTicket || !estadoNuevo) {
+                return;
+            }
+
+            const ticketActual = TicketStorage.buscarTicketPorId(idTicket);
+
+            if (!ticketActual) {
+                return;
+            }
+
+            const estadoNormalizado = TicketServicio.normalizarEstado(estadoNuevo);
+            const nuevoTicket = TicketStorage.actualizarTicket(idTicket, {
+                estado: estadoNormalizado
+            });
+
+            if (nuevoTicket) {
+                recargarTabla();
+                const modal = bootstrap.Modal.getInstance(modalEstado);
+                if (modal) {
+                    modal.hide();
+                }
+            }
+        });
+    }
+
+    if (tabla) {
+        tabla.addEventListener("click", function (event) {
+            const boton = event.target.closest(".botonEliminar");
+
+            if (!boton) {
+                return;
+            }
+
+            const idTicket = boton.dataset.ticketId;
+            const ticket = TicketStorage.buscarTicketPorId(idTicket);
+
+            if (!ticket) {
+                return;
+            }
+
+            const confirmado = window.confirm(`¿Eliminar el ticket #${ticket.id}?`);
+            if (!confirmado) {
+                return;
+            }
+
+            TicketStorage.eliminarTicket(idTicket);
+            recargarTabla();
+        });
+    }
 });

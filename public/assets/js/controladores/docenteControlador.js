@@ -29,7 +29,10 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
-        // Crear ticket y guardarlo
+        // Crear ticket y guardarlo con la prioridad real
+        // de la incidencia reportada por el docente.
+        const prioridad = TicketServicio.obtenerPrioridadDesdeIncidencias(equiposConIncidencia);
+
         const ticket = new Ticket(
             Date.now(),
             datosFormulario.tipoSala,
@@ -42,7 +45,7 @@ document.addEventListener("DOMContentLoaded", () => {
             datosFormulario.grupo,
             datosFormulario.turno,
             equiposConIncidencia,
-            2,
+            prioridad,
             "Pendiente"
         );
 

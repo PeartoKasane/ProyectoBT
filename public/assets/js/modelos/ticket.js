@@ -29,3 +29,5 @@ class Ticket {
         this.estado = estado;
     }
 }
+
+globalThis.Ticket = Ticket;
