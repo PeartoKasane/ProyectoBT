@@ -1,3 +1,9 @@
+<!--
+  este archivo es la vista de administración.
+  no lo toco mucho porque si rompo algo se rompe todo.
+  pero basicamente hace falta para mostrar la pantalla.
+-->
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -12,8 +18,9 @@
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
         <div class="container-fluid px-4">
             <a class="navbar-brand fw-bold" href="#">Panel de Administración</a>
-            <div class="navbar-nav ms-auto">
-                <a class="btn btn-outline-danger btn-sm fw-bold" href="Login.html">Cerrar Sesión</a>
+            <div class="navbar-nav ms-auto d-flex align-items-center gap-2">
+                <div id="selectorVentanaUsuario" class="d-flex gap-2"></div>
+                <a class="btn btn-outline-danger btn-sm fw-bold" href="index.html" onclick="localStorage.removeItem('sesionUsuario');">Cerrar Sesión</a>
             </div>
         </div>
     </nav>
@@ -53,6 +60,77 @@
                 <button type="button" class="botonCambiarEstado btn btn-dark fw-semibold shadow-sm px-4 py-2" data-bs-toggle="modal" data-bs-target="#modal-cambiar-estado">
                     Modificar estado de los tickets
                 </button>
+            </div>
+        </section>
+
+        <section class="row mb-4" aria-label="Gestión de usuarios">
+            <div class="col-12">
+                <div class="card shadow-sm border-0 bg-white p-4">
+                    <h2 class="h4 fw-bold text-dark mb-3">Gestión de usuarios</h2>
+
+                    <div id="mensajeUsuario" class="alert alert-secondary d-none" role="alert"></div>
+
+                    <div class="row g-3">
+                        <div class="col-12 col-lg-4">
+                            <form id="form-agregar-usuario" class="border rounded p-3 bg-light">
+                                <h3 class="h6 fw-bold text-dark mb-3">Agregar usuario</h3>
+                                <div class="mb-3">
+                                    <label for="cedulaUsuario" class="form-label fw-semibold text-secondary">Cédula:</label>
+                                    <input type="text" id="cedulaUsuario" class="form-control" placeholder="Ej: 12345678" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="nombreUsuario" class="form-label fw-semibold text-secondary">Nombre:</label>
+                                    <input type="text" id="nombreUsuario" class="form-control" placeholder="Ej: Juan Pérez" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="rolUsuario" class="form-label fw-semibold text-secondary">Rol:</label>
+                                    <select id="rolUsuario" class="form-select" required>
+                                        <option value="">Seleccione un rol</option>
+                                        <option value="Administrador">Administrador</option>
+                                        <option value="Técnico">Técnico</option>
+                                        <option value="Docente">Docente</option>
+                                        <option value="Dirección">Dirección</option>
+                                    </select>
+                                </div>
+                                <button type="submit" class="btn btn-dark w-100">Agregar usuario</button>
+                            </form>
+                        </div>
+
+                        <div class="col-12 col-lg-4">
+                            <form id="form-eliminar-usuario" class="border rounded p-3 bg-light">
+                                <h3 class="h6 fw-bold text-dark mb-3">Eliminar usuario</h3>
+                                <div id="mensajeEliminarUsuario" class="alert alert-secondary d-none" role="alert"></div>
+                                <div class="mb-3">
+                                    <label for="cedulaEliminarUsuario" class="form-label fw-semibold text-secondary">Cédula:</label>
+                                    <input type="text" id="cedulaEliminarUsuario" class="form-control" placeholder="Ej: 12345678" required>
+                                </div>
+                                <button type="submit" class="btn btn-outline-danger w-100">Eliminar usuario</button>
+                            </form>
+                        </div>
+
+                        <div class="col-12 col-lg-4">
+                            <form id="form-cambiar-rol" class="border rounded p-3 bg-light">
+                                <h3 class="h6 fw-bold text-dark mb-3">Cambiar rol</h3>
+                                <div id="mensajeCambioRol" class="alert alert-secondary d-none" role="alert"></div>
+                                <div class="mb-3">
+                                    <label for="cedulaCambioRol" class="form-label fw-semibold text-secondary">Cédula:</label>
+                                    <input type="text" id="cedulaCambioRol" class="form-control" placeholder="Ej: 12345678" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="nuevoRolUsuario" class="form-label fw-semibold text-secondary">Nuevo rol:</label>
+                                    <select id="nuevoRolUsuario" class="form-select" required>
+                                        <option value="">Seleccione un rol</option>
+                                        <option value="Administrador">Administrador</option>
+                                        <option value="Técnico">Técnico</option>
+                                        <option value="Docente">Docente</option>
+                                        <option value="Dirección">Dirección</option>
+                                    </select>
+                                </div>
+                                <button type="submit" class="btn btn-warning text-dark w-100">Cambiar rol</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
             </div>
         </section>
 
@@ -155,6 +233,11 @@
 
 <!-- Lógica relacionada con las solicitudes de programas -->
 <script src="assets/js/servicios/solicitudProgramaServicio.js"></script>
+<script src="assets/js/servicios/permisosServicio.js"></script>
+
+<!-- Modelos y vistas relacionadas con usuarios -->
+<script src="assets/js/modelos/usuario.js"></script>
+<script src="assets/js/vistas/usuarioVista.js"></script>
 
 <!-- Vista de la página de administración -->
 <script src="assets/js/vistas/adminVista.js"></script>
@@ -163,6 +246,7 @@
 <!-- Controlador de la página de administración -->
 <script src="assets/js/controladores/adminControlador.js"></script>
 <script src="assets/js/controladores/solicitudProgramaControlador.js"></script>
+<script src="assets/js/controladores/usuarioControlador.js"></script>
 
 <!-- JavaScript de Bootstrap -->
 <script

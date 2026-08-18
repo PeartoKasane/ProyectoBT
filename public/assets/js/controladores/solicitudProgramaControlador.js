@@ -1,3 +1,9 @@
+/*
+  este archivo es la controlador de solicitudes.
+  aca va la logica del JS y no me gusta romperlo.
+  pero por ahora sirve para que el sistema funcione.
+*/
+
 document.addEventListener("DOMContentLoaded", () => {
     const formularioSolicitud = document.getElementById("form-solicitud-programa");
     const tablaSolicitudes = document.getElementById("registro_solicitudes");

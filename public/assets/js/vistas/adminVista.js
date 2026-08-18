@@ -1,3 +1,9 @@
+/*
+  este archivo es la vista del admin.
+  aca va la logica del JS y no me gusta romperlo.
+  pero por ahora sirve para que el sistema funcione.
+*/
+
 class AdminVista {
 
     static obtenerTabla() {
@@ -53,10 +59,12 @@ class AdminVista {
         const incidencias = TicketServicio.obtenerIncidencias(ticket);
         const descripcion = TicketServicio.obtenerIncidenciasTexto(ticket);
         const estudiantes = TicketServicio.obtenerEstudiantesTexto(ticket);
+        const equipos = TicketServicio.obtenerEquiposTexto(ticket);
 
         return `
             <div class="infoTicket text-start">
                 <div class="datosTicket"><strong>Incidencia:</strong> ${descripcion}</div>
+                <div class="datosTicket"><strong>Equipo:</strong> ${equipos}</div>
                 <div class="datosTicket"><strong>Estudiante:</strong> ${estudiantes}</div>
                 <div class="datosTicket"><strong>ID:</strong> #${ticket.id}</div>
                 <button type="button" class="botonEliminar btn btn-link btn-sm text-danger p-0 mt-2" data-ticket-id="${ticket.id}" aria-label="Eliminar ticket ${ticket.id}">

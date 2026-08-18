@@ -1,3 +1,9 @@
+/*
+  este archivo es la servicio de tickets.
+  aca va la logica del JS y no me gusta romperlo.
+  pero por ahora sirve para que el sistema funcione.
+*/
+
 class TicketServicio {
 
     // La prioridad real depende del tipo de incidencia.
@@ -43,6 +49,16 @@ class TicketServicio {
         }
 
         return incidencias.map(equipo => equipo.estudiante || "Sin nombre").join(", ");
+    }
+
+    static obtenerEquiposTexto(ticket) {
+        const incidencias = this.obtenerIncidencias(ticket);
+
+        if (incidencias.length === 0) {
+            return "Sin equipo";
+        }
+
+        return incidencias.map(equipo => equipo.numero || "Sin equipo").join(", ");
     }
 
     static calcularPrioridadDesdeIncidencias(incidencias) {

@@ -1,3 +1,9 @@
+/*
+  este archivo es la script para elegir la sala.
+  aca va la logica del JS y no me gusta romperlo.
+  pero por ahora sirve para que el sistema funcione.
+*/
+
 // Obtiene los elementos del formulario relacionados
 // con la selección del tipo y número de sala.
 const tipoSala = document.getElementById("tipo_sala");

@@ -1,3 +1,8 @@
+/*
+  este archivo es la servicio de incidencias.
+  xddd
+*/
+
 class IncidenciaServicio {
 
     static obtenerEquiposConIncidencias(equipos) {

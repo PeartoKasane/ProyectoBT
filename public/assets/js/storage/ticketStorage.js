@@ -1,3 +1,9 @@
+/*
+  este archivo es la storage de tickets.
+  aca va la logica del JS y no me gusta romperlo.
+  pero por ahora sirve para que el sistema funcione.
+*/
+
 class TicketStorage {
 
     static obtenerTickets() {

@@ -1,3 +1,9 @@
+/*
+  este archivo es la vista del docente.
+  aca va la logica del JS y no me gusta romperlo.
+  pero por ahora sirve para que el sistema funcione.
+*/
+
 class DocenteVista {
 
     static obtenerDatosFormulario() {

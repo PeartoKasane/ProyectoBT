@@ -1,3 +1,8 @@
+/*
+  este archivo es el de solicitudes de programa.
+  xdd
+*/
+
 class SolicitudProgramaServicio {
 
     static ESTADOS_VALIDOS = [

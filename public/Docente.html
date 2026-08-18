@@ -1,3 +1,9 @@
+<!--
+  este archivo es la vista del docente.
+  no lo toco mucho porque si rompo algo se rompe todo.
+  pero basicamente hace falta para mostrar la pantalla.
+-->
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -12,8 +18,9 @@
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
         <div class="container-fluid px-4">
             <a class="navbar-brand fw-bold" href="#">Registro de Docentes</a>
-            <div class="navbar-nav ms-auto">
-                <a class="btn btn-outline-danger btn-sm fw-bold" href="Login.html">Cerrar Sesión</a>
+            <div class="navbar-nav ms-auto d-flex align-items-center gap-2">
+                <div id="selectorVentanaUsuario" class="d-flex gap-2"></div>
+                <a class="btn btn-outline-danger btn-sm fw-bold" href="index.html" onclick="localStorage.removeItem('sesionUsuario');">Cerrar Sesión</a>
             </div>
         </div>
     </nav>
@@ -389,7 +396,7 @@
             </section>
 
             <section class="row justify-content-center g-3" aria-label="Acciones del formulario">
-                <div class="col-auto">
+                 
                     <button type="button" class="btn btn-outline-secondary fw-semibold shadow-sm px-4 py-2" onclick="location.href='NeedApp.html'">
                         Necesito un Programa
                     </button>
@@ -420,8 +427,12 @@
     <script src="assets/js/servicios/ticketServicio.js"></script>
 
     <!-- Vistas y controladores -->
+    <script src="assets/js/modelos/usuario.js"></script>
+    <script src="assets/js/servicios/permisosServicio.js"></script>
+    <script src="assets/js/vistas/usuarioVista.js"></script>
     <script src="assets/js/vistas/docenteVista.js"></script>
     <script src="assets/js/controladores/docenteControlador.js"></script>
+    <script src="assets/js/controladores/usuarioControlador.js"></script>
 
     <!-- Funcionalidad auxiliar -->
     <script src="assets/js/SelectSala.js"></script>

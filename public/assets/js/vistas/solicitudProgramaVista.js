@@ -1,3 +1,9 @@
+/*
+  este archivo es la vista de solicitudes.
+  aca va la logica del JS y no me gusta romperlo.
+  pero por ahora sirve para que el sistema funcione.
+*/
+
 class SolicitudProgramaVista {
 
     static obtenerDatosFormulario() {

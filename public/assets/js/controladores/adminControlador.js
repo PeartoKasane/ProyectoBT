@@ -1,3 +1,9 @@
+/*
+  este archivo es la controlador del admin.
+  aca va la logica del JS y no me gusta romperlo.
+  pero por ahora sirve para que el sistema funcione.
+*/
+
 document.addEventListener("DOMContentLoaded", () => {
     const tabla = document.getElementById("registro_tickets");
     const modalEstado = document.getElementById("modal-cambiar-estado");

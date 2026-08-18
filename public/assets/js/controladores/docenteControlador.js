@@ -1,4 +1,19 @@
+/*
+  este archivo es la controlador del docente.
+  aca va la logica del JS y no me gusta romperlo.
+  pero por ahora sirve para que el sistema funcione.
+*/
+
 document.addEventListener("DOMContentLoaded", () => {
+    const usuarioActual = PermisoServicio.obtenerSesionUsuario();
+
+    if (!PermisoServicio.validarAccesoPagina('Docente')) {
+        return;
+    }
+
+    if (usuarioActual && usuarioActual.roles && usuarioActual.roles.length > 1) {
+        UsuarioVista.renderizarRolesUsuario(usuarioActual.roles);
+    }
 
     const formulario = document.getElementById("form-docente");
 
@@ -29,7 +44,7 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
-        // Crear ticket y guardarlo con la prioridad real
+        // Crear ticket y guardarlo con la prioridad 
         // de la incidencia reportada por el docente.
         const prioridad = TicketServicio.obtenerPrioridadDesdeIncidencias(equiposConIncidencia);
 

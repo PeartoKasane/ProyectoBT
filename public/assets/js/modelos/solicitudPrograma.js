@@ -1,3 +1,9 @@
+/*
+  este archivo es la modelo de la solicitud de programa.
+  aca va la logica del JS y no me gusta romperlo.
+  pero por ahora sirve para que el sistema funcione.
+*/
+
 class SolicitudPrograma {
     constructor(
         id,
