@@ -21,7 +21,8 @@ $nombre_docente = $_SESSION["usuario"];
         <h1>Panel de Docentes - SGRSI</h1>
         <nav class="user-info">
             <span>Bienvenido, <strong><?php echo htmlspecialchars($nombre_docente); ?></strong></span> | 
-            <a href="logout.php" style="color: #ff4d4d; text-decoration: none; font-weight: bold;">Cerrar Sesión</a>
+            <!-- Estilo del enlace de cierre de sesión viene de .logout-link en assets/css/global.css -->
+            <a href="logout.php" class="logout-link">Cerrar Sesión</a>
         </nav>
     </header>
     <main>

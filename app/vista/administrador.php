@@ -100,6 +100,7 @@
                             <td><?= htmlspecialchars($roles) ?></td>
 
                             <td>
+                                <!-- Botones de acción para cada fila: agruparlos facilita el estilo y eventos -->
                                 <div class="cajaOperaciones">
                                     <button type="button" class="btnOperacion btnModificar">Modificar</button>
                                     <button type="button" class="btnOperacion btnEliminar">Eliminar</button>
@@ -128,6 +129,7 @@
                             Datos del empleado
                         </legend>
 
+                        <!-- Caja que envuelve un campo del formulario: sirve para separar label+input y mostrar errores locales -->
                         <div class="cajaEntradaDeDatos">
                             <label for="cedula">
                                 Cédula

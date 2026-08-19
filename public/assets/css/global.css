@@ -227,3 +227,38 @@ body {
 .col-prioridad {
     width: 15%;
 }
+
+/* Reemplazos de estilos inline movidos aquí */
+.login-card {
+    max-width: 400px;
+}
+
+.admin-figure-wrap {
+    max-width: 600px;
+    width: 100%;
+}
+
+.needapp-main {
+    max-width: 700px;
+}
+
+.th-num-equipo {
+    width: 15%;
+}
+
+.th-estado-equipo {
+    width: 35%;
+}
+
+.logout-link {
+    color: #ff4d4d;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.alert-error-inline {
+    color: #ff4d4d;
+    margin-bottom: 15px;
+    font-weight: bold;
+    text-align: center;
+}

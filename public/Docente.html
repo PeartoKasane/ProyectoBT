@@ -16,9 +16,12 @@
 <body class="bg-light d-flex flex-column min-vh-100 justify-content-between">
 
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
+        <!-- Contenedor de la navbar: controla el ancho y padding superior -->
         <div class="container-fluid px-4">
             <a class="navbar-brand fw-bold" href="#">Registro de Docentes</a>
+            <!-- Zona derecha de la navbar: espacio para menú y cierre de sesión -->
             <div class="navbar-nav ms-auto d-flex align-items-center gap-2">
+                <!-- Aquí el JS coloca el selector/ventana del usuario -->
                 <div id="selectorVentanaUsuario" class="d-flex gap-2"></div>
                 <a class="btn btn-outline-danger btn-sm fw-bold" href="index.html" onclick="localStorage.removeItem('sesionUsuario');">Cerrar Sesión</a>
             </div>
@@ -28,6 +31,7 @@
     <main class="container my-4 flex-grow-1">
         
         <header class="row mb-4">
+            <!-- Título grande centrado de la planilla -->
             <div class="col-12 text-center">
                 <h1 class="display-6 fw-bold text-dark bg-secondary text-white py-3 rounded shadow-sm m-0">PLANILLA DE REGISTRO DE USO DE SALA DE INFORMÁTICA</h1>
             </div>
@@ -35,9 +39,11 @@
 
         <form id="form-docente" class="bg-white p-4 rounded shadow-sm border-0 mb-4">
             
+            <!-- Formulario principal: dividido en columnas para móvil/desktop -->
             <section class="row g-3 mb-4" aria-label="Información General">
                 
                 <div class="col-12 col-md-3">
+                    <!-- Caja para el select tipo de sala (añade separación debajo) -->
                     <div class="mb-3">
                         <label for="tipo_sala" class="form-label fw-semibold text-secondary">Tipo de Sala:</label>
                         <select id="tipo_sala">
@@ -55,6 +61,7 @@
                 </div>
 
                 <div class="col-12 col-md-6 border-start border-end px-3 bordeMovil">
+                    <!-- Zona central: fecha/hora y asignatura, organizada en subcolumnas -->
                     <div class="row g-2 mb-3">
                         <div class="col-4">
                             <label for="fecha" class="form-label fw-semibold text-secondary">Fecha:</label>
@@ -80,6 +87,7 @@
                 </div>
 
                 <div class="col-12 col-md-3">
+                    <!-- Columna derecha: grupo y turno -->
                     <div class="mb-3">
                         <label for="grupo" class="form-label fw-semibold text-secondary">Grupo:</label>
                         <input type="text" id="grupo" name="grupo" class="form-control" placeholder="Indique el grupo" required>
@@ -97,15 +105,16 @@
 
             </section>
 
+            <!-- Tabla de equipos: dentro de una caja que la hace scrollable y le pone borde -->
             <section class="row mb-4" aria-label="Registro de Equipos">
                 <div class="col-12">
                     <div class="table-responsive border rounded">
                         <table class="table table-striped table-hover align-middle m-0">
                             <thead class="table-dark text-center">
                                 <tr>
-                                    <th scope="col" style="width: 15%;">N° equipo</th>
+                                    <th scope="col" class="th-num-equipo">N° equipo</th>
                                     <th scope="col">Nombre y Apellido</th>
-                                    <th scope="col" style="width: 35%;">Estado del Equipo</th>
+                                    <th scope="col" class="th-estado-equipo">Estado del Equipo</th>
                                 </tr>
                             </thead>
                             <tbody id="registro_salas" class="text-center">
@@ -395,6 +404,7 @@
                 </div>
             </section>
 
+            <!-- Botones de acción: uno para 'necesito programa' y otro para enviar (se organizan con columnas) -->
             <section class="row justify-content-center g-3" aria-label="Acciones del formulario">
                  
                     <button type="button" class="btn btn-outline-secondary fw-semibold shadow-sm px-4 py-2" onclick="location.href='NeedApp.html'">
@@ -409,6 +419,36 @@
             </section>
 
         </form>
+
+        <!-- Historial de tickets del docente -->
+        <section class="row mb-4" aria-label="Historial de tickets">
+            <div class="col-12">
+                <div class="bg-white p-3 rounded shadow-sm">
+                    <h2 class="h5 fw-bold text-dark mb-3">Historial de tickets</h2>
+                    <div class="table-responsive border rounded">
+                        <table class="table table-sm table-striped table-hover align-middle m-0">
+                            <thead class="table-dark text-center">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Docente</th>
+                                    <th>Tipo Sala</th>
+                                    <th>Número Sala</th>
+                                    <th>Fecha</th>
+                                    <th>Hora Entrada</th>
+                                    <th>Hora Salida</th>
+                                    <th>Prioridad</th>
+                                    <th>Estado</th>
+                                    <th>Descripción</th>
+                                </tr>
+                            </thead>
+                            <tbody id="historial_tickets_body" class="text-center small">
+                                <!-- Filas generadas dinámicamente -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
     </main>
 
     <footer class="w-100 bg-secondary text-white text-center py-3">

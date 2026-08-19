@@ -35,6 +35,7 @@ class DireccionVista {
                 <tr data-ticket-id="${ticket.id}">
                     <td class="fw-semibold">${AdminVista.obtenerSala(ticket)}</td>
                     <td class="fw-semibold">
+                        <!-- `infoTicket`: contenedor con los datos del ticket. Cada `datosTicket` es una línea (Incidencia, Equipo, Estudiante, ID). -->
                         <div class="infoTicket text-start">
                             <div class="datosTicket"><strong>Incidencia:</strong> ${TicketServicio.obtenerIncidenciasTexto(ticket)}</div>
                             <div class="datosTicket"><strong>Equipo:</strong> ${equipo}</div>

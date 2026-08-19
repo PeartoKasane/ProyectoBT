@@ -14,6 +14,7 @@ class Ticket {
         horaSalida,
         asignatura,
         docente,
+        docenteCedula,
         grupo,
         turno,
         equipos,
@@ -28,6 +29,7 @@ class Ticket {
         this.horaSalida = horaSalida;
         this.asignatura = asignatura;
         this.docente = docente;
+        this.docenteCedula = docenteCedula || null;
         this.grupo = grupo;
         this.turno = turno;
         this.equipos = equipos;

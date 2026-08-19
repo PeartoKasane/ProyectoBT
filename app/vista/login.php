@@ -73,6 +73,7 @@
                 <fieldset>
                     <legend>Inicio de sesión</legend>
 
+                    <!-- Cada input está dentro de su caja: facilita mostrar label, input y mensajes de error separados -->
                     <div class="cajaEntradaDeDatos">
                         <label for="cedula">
                             Cédula

@@ -70,7 +70,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <p>Sistema de Gestión de Reportes de Salones de Informática</p>
             
             <?php if (!empty($error)): ?>
-                <p role="alert" style="color: #ff4d4d; margin-bottom: 15px; font-weight: bold; text-align: center;">
+                <!-- Mensaje de error con estilos movidos a .alert-error-inline en assets/css/global.css -->
+                <p role="alert" class="alert-error-inline">
                     <?php echo $error; ?>
                 </p>
             <?php endif; ?>

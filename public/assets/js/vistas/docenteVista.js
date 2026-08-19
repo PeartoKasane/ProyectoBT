@@ -61,5 +61,55 @@ class DocenteVista {
     static limpiarFormulario() {
         document.getElementById("form-docente").reset();
     }
+
+    static renderHistorialTickets(tickets, usuarioActual) {
+        const tbody = document.getElementById('historial_tickets_body');
+
+        if (!tbody) return;
+
+        // Filtrar tickets pertenecientes al docente logueado
+        const cedulaDocente = usuarioActual && usuarioActual.cedula ? String(usuarioActual.cedula).trim() : '';
+        const nombreDocente = usuarioActual && usuarioActual.nombre ? String(usuarioActual.nombre).trim() : '';
+
+        const ticketsFiltrados = (Array.isArray(tickets) ? tickets : []).filter(ticket => {
+            try {
+                // Preferir comparación por cédula si está disponible
+                if (cedulaDocente && ticket && ticket.docenteCedula) {
+                    return String(ticket.docenteCedula) === cedulaDocente;
+                }
+
+                // compara por nombre si no hay cédula en el ticket
+                const tdoc = ticket && ticket.docente ? String(ticket.docente).trim() : '';
+                return nombreDocente && tdoc && tdoc === nombreDocente;
+            } catch (e) {
+                return false;
+            }
+        });
+
+        // Construir filas
+        const filas = ticketsFiltrados.map(ticket => {
+            const descripcion = TicketServicio.obtenerIncidenciasTexto(ticket);
+            const horaSalida = ticket.horaSalida || '';
+            const prioridad = TicketServicio.obtenerPrioridad(ticket);
+            const estado = TicketServicio.normalizarEstado(ticket.estado);
+
+            return `
+                <tr>
+                    <td class="text-center">${ticket.id}</td>
+                    <td>${ticket.docente || ''}</td>
+                    <td>${ticket.tipoSala || ''}</td>
+                    <td>${ticket.numeroSala || ''}</td>
+                    <td>${ticket.fecha || ''}</td>
+                    <td>${ticket.horaEntrada || ''}</td>
+                    <td>${horaSalida}</td>
+                    <td class="text-center">${prioridad}</td>
+                    <td>${estado}</td>
+                    <td>${descripcion}</td>
+                </tr>
+            `;
+        }).join('\n');
+
+        tbody.innerHTML = filas || '<tr><td colspan="10">No hay tickets registrados para este docente.</td></tr>';
+    }
 }
 

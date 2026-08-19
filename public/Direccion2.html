@@ -16,9 +16,12 @@
 <body class="bg-light d-flex flex-column min-vh-100 justify-content-between">
 
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
+        <!-- Contenedor del header/navbar -->
         <div class="container-fluid px-4">
             <a class="navbar-brand fw-bold" href="#">Panel de Dirección</a>
+            <!-- Zona para controles de usuario en la navbar -->
             <div class="navbar-nav ms-auto d-flex align-items-center gap-2">
+                <!-- Lugar donde el JS inyecta el selector/ventana del usuario -->
                 <div id="selectorVentanaUsuario" class="d-flex gap-2"></div>
                 <a class="btn btn-outline-danger btn-sm fw-bold" href="index.html" onclick="localStorage.removeItem('sesionUsuario');">Cerrar Sesión</a>
             </div>
@@ -27,6 +30,7 @@
 
     <main class="container my-4 flex-grow-1">
         <header class="row mb-4">
+            <!-- Título central y aviso que explica que esta vista es solo lectura -->
             <div class="col-12 text-center">
                 <h1 class="display-6 fw-bold text-dark bg-secondary text-white py-3 rounded shadow-sm">Vista de Dirección</h1>
                 <div class="alert alert-info mt-3 shadow-sm" role="alert">
@@ -37,6 +41,7 @@
 
         <section class="row mb-4" aria-label="Tickets de dirección">
             <div class="col-12">
+                <!-- Contenedor para la tabla de tickets (scrollable en móvil) -->
                 <div class="tablaContenedor table-responsive shadow-sm rounded bg-white p-3">
                     <h2 class="h4 fw-bold text-dark mb-3">Tickets</h2>
                     <table class="table table-striped table-hover align-middle m-0">
@@ -56,6 +61,7 @@
 
         <section class="row mb-4" aria-label="Solicitudes de dirección">
             <div class="col-12">
+                <!-- Contenedor para la tabla de solicitudes de preparación -->
                 <div class="tablaContenedor table-responsive shadow-sm rounded bg-white p-3">
                     <h2 class="h4 fw-bold text-dark mb-3">Solicitudes de preparación</h2>
                     <table class="table table-striped table-hover align-middle m-0">

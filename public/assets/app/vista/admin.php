@@ -21,7 +21,8 @@ $nombre_admin = $_SESSION["usuario"];
         <h1>Panel de Administración - SGRSI</h1>
         <nav class="user-info">
             <span>Bienvenido, <strong><?php echo htmlspecialchars($nombre_admin); ?></strong></span> | 
-            <a href="logout.php" style="color: #ff4d4d; text-decoration: none; font-weight: bold;">Cerrar Sesión</a>
+            <!-- Estilo de este enlace se aplica con la clase .logout-link en assets/css/global.css -->
+            <a href="logout.php" class="logout-link">Cerrar Sesión</a>
         </nav>
     </header>
     <main>

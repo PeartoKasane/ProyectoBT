@@ -16,9 +16,12 @@
 <body class="bg-light d-flex flex-column min-vh-100 justify-content-between">
 
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
+        <!-- Contenedor de la navbar: mantiene el padding y ancho del header -->
         <div class="container-fluid px-4">
             <a class="navbar-brand fw-bold" href="#">Panel de Técnico</a>
+            <!-- Zona de la derecha en la navbar: espacio para el menú del usuario y botón de logout -->
             <div class="navbar-nav ms-auto d-flex align-items-center gap-2">
+                <!-- Aquí se inyecta el selector de ventana/usuario por JS -->
                 <div id="selectorVentanaUsuario" class="d-flex gap-2"></div>
                 <a class="btn btn-outline-danger btn-sm fw-bold" href="index.html" onclick="localStorage.removeItem('sesionUsuario');">Cerrar Sesión</a>
             </div>
@@ -27,6 +30,7 @@
 
     <main class="container my-4 flex-grow-1">
         <header class="row mb-4">
+            <!-- Título de la página y aviso explicativo -->
             <div class="col-12 text-center">
                 <h1 class="display-6 fw-bold text-dark bg-secondary text-white py-3 rounded shadow-sm">Vista Técnica</h1>
                 <div class="alert alert-info mt-3 shadow-sm" role="alert">
@@ -37,6 +41,7 @@
 
         <section class="row mb-4" aria-label="Tickets del técnico">
             <div class="col-12">
+                <!-- Contenedor de tabla para tickets: fondo blanco y scroll en móvil -->
                 <div class="tablaContenedor table-responsive shadow-sm rounded bg-white p-3">
                     <h2 class="h4 fw-bold text-dark mb-3">Tickets</h2>
                     <table class="table table-striped table-hover align-middle m-0">
@@ -56,6 +61,7 @@
 
         <section class="row mb-4" aria-label="Solicitudes del técnico">
             <div class="col-12">
+                <!-- Contenedor de tabla para solicitudes de preparación -->
                 <div class="tablaContenedor table-responsive shadow-sm rounded bg-white p-3">
                     <h2 class="h4 fw-bold text-dark mb-3">Solicitudes de preparación</h2>
                     <table class="table table-striped table-hover align-middle m-0">

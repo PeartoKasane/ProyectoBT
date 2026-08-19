@@ -61,6 +61,9 @@ class AdminVista {
         const estudiantes = TicketServicio.obtenerEstudiantesTexto(ticket);
         const equipos = TicketServicio.obtenerEquiposTexto(ticket);
 
+        // `infoTicket`: contenedor que agrupa toda la info del ticket (alineada a la izquierda)
+        // `datosTicket`: cada línea de información dentro del contenedor (Incidencia, Equipo, Estudiante, ID)
+        // El botón "Eliminar" está dentro del mismo contenedor para que se relacione visualmente con los datos.
         return `
             <div class="infoTicket text-start">
                 <div class="datosTicket"><strong>Incidencia:</strong> ${descripcion}</div>

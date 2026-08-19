@@ -16,9 +16,12 @@
 <body class="bg-light d-flex flex-column min-vh-100 justify-content-between">
 
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
+        <!-- Contenedor ancho que agrupa la navbar: controla el padding horizontal -->
         <div class="container-fluid px-4">
             <a class="navbar-brand fw-bold" href="#">Panel de Administración</a>
+            <!-- Zona de la derecha en la navbar: botones y espacio para el menú del usuario -->
             <div class="navbar-nav ms-auto d-flex align-items-center gap-2">
+                <!-- Placeholder donde el JS inyecta el selector/menú del usuario -->
                 <div id="selectorVentanaUsuario" class="d-flex gap-2"></div>
                 <a class="btn btn-outline-danger btn-sm fw-bold" href="index.html" onclick="localStorage.removeItem('sesionUsuario');">Cerrar Sesión</a>
             </div>
@@ -28,8 +31,10 @@
     <main class="container my-4 flex-grow-1">
         
         <header class="row mb-4">
+            <!-- Encabezado centrado: título y aviso informativo -->
             <div class="col-12 text-center">
                 <h1 class="display-6 fw-bold text-dark bg-secondary text-white py-3 rounded shadow-sm">Panel de Administración</h1>
+                <!-- Aviso informativo: se usa para explicar reglas o mostrar mensajes importantes -->
                 <div class="alert alert-info mt-3 shadow-sm" role="alert">
                     La prioridad de los tickets va de <strong>0 a 2</strong>, donde 0 es la más alta y 2 es la más baja.
                 </div>
@@ -38,6 +43,7 @@
 
         <section class="row mb-4" aria-label="Listado de Tickets">
             <div class="col-12">
+                <!-- Contenedor de tabla: hace la tabla scrollable en móvil y le da fondo/padding -->
                 <div class="tablaContenedor table-responsive shadow-sm rounded bg-white p-3">
                     <table class="table table-striped table-hover align-middle m-0">
                         <thead class="table-dark text-center">
@@ -56,6 +62,7 @@
         </section>
 
         <section class="row justify-content-center mb-4" aria-label="Acciones de administración">
+            <!-- Botón centrado en su columna: accion rápida para abrir modal -->
             <div class="col-auto text-center">
                 <button type="button" class="botonCambiarEstado btn btn-dark fw-semibold shadow-sm px-4 py-2" data-bs-toggle="modal" data-bs-target="#modal-cambiar-estado">
                     Modificar estado de los tickets
@@ -65,15 +72,18 @@
 
         <section class="row mb-4" aria-label="Gestión de usuarios">
             <div class="col-12">
+                <!-- Tarjeta para gestión de usuarios: agrupa los 3 formularios y les da un fondo y padding -->
                 <div class="card shadow-sm border-0 bg-white p-4">
                     <h2 class="h4 fw-bold text-dark mb-3">Gestión de usuarios</h2>
-
+                    <!-- Mensajes dinámicos sobre operaciones con usuarios (éxito/error) -->
                     <div id="mensajeUsuario" class="alert alert-secondary d-none" role="alert"></div>
 
+                    <!-- Fila que organiza los 3 formularios en columnas responsive -->
                     <div class="row g-3">
                         <div class="col-12 col-lg-4">
                             <form id="form-agregar-usuario" class="border rounded p-3 bg-light">
                                 <h3 class="h6 fw-bold text-dark mb-3">Agregar usuario</h3>
+                                <!-- Campo Cédula: cada input está en su propia caja para separar errores/labels -->
                                 <div class="mb-3">
                                     <label for="cedulaUsuario" class="form-label fw-semibold text-secondary">Cédula:</label>
                                     <input type="text" id="cedulaUsuario" class="form-control" placeholder="Ej: 12345678" required>
@@ -99,7 +109,9 @@
                         <div class="col-12 col-lg-4">
                             <form id="form-eliminar-usuario" class="border rounded p-3 bg-light">
                                 <h3 class="h6 fw-bold text-dark mb-3">Eliminar usuario</h3>
+                                <!-- Mensaje dinámico para eliminación -->
                                 <div id="mensajeEliminarUsuario" class="alert alert-secondary d-none" role="alert"></div>
+                                <!-- Campo para cédula a eliminar -->
                                 <div class="mb-3">
                                     <label for="cedulaEliminarUsuario" class="form-label fw-semibold text-secondary">Cédula:</label>
                                     <input type="text" id="cedulaEliminarUsuario" class="form-control" placeholder="Ej: 12345678" required>
@@ -111,7 +123,9 @@
                         <div class="col-12 col-lg-4">
                             <form id="form-cambiar-rol" class="border rounded p-3 bg-light">
                                 <h3 class="h6 fw-bold text-dark mb-3">Cambiar rol</h3>
+                                <!-- Mensaje dinámico para cambio de rol -->
                                 <div id="mensajeCambioRol" class="alert alert-secondary d-none" role="alert"></div>
+                                <!-- Campo y select para cambiar rol -->
                                 <div class="mb-3">
                                     <label for="cedulaCambioRol" class="form-label fw-semibold text-secondary">Cédula:</label>
                                     <input type="text" id="cedulaCambioRol" class="form-control" placeholder="Ej: 12345678" required>
@@ -199,7 +213,8 @@
         <section class="row justify-content-center mb-4" aria-label="Visualización de datos">
             <div class="col-12 col-md-8 text-center">
                 <figure class="card shadow-sm p-4 bg-white border-0 d-flex align-items-center justify-content-center m-0">
-                    <div style="max-width: 600px; width: 100%;">
+                    <!-- Contenedor responsable del ancho de la figura (clase .admin-figure-wrap en global.css) -->
+                    <div class="admin-figure-wrap">
                         <img src="assets/Imgs/Gráfico.png" alt="Gráfico de Incidencias" class="img-fluid rounded w-100 h-auto">
                     </div>
                     <figcaption class="visually-hidden">Gráfica de Incidencias del sistema</figcaption>

@@ -57,6 +57,8 @@ document.addEventListener("DOMContentLoaded", () => {
             datosFormulario.horaSalida,
             datosFormulario.asignatura,
             datosFormulario.docente,
+            // guardar la cédula del docente para identificación única
+            usuarioActual && usuarioActual.cedula ? usuarioActual.cedula : null,
             datosFormulario.grupo,
             datosFormulario.turno,
             equiposConIncidencia,
@@ -68,7 +70,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
         DocenteVista.mostrarMensaje("Ticket generado correctamente.");
 
+        // Limpiar formulario y refrescar historial
         DocenteVista.limpiarFormulario();
+        DocenteVista.renderHistorialTickets(TicketStorage.obtenerTickets(), usuarioActual);
+    });
+
+    // Mostrar historial al cargar la página
+    DocenteVista.renderHistorialTickets(TicketStorage.obtenerTickets(), usuarioActual);
+
+    // Escuchar cambios en localStorage desde otras pestañas/ventanas
+    window.addEventListener('storage', (e) => {
+        if (e.key === 'tickets') {
+            DocenteVista.renderHistorialTickets(TicketStorage.obtenerTickets(), usuarioActual);
+        }
     });
 });
 
