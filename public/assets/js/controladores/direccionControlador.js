@@ -16,11 +16,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function cargarDatos() {
         if (tablaTickets) {
-            DireccionVista.mostrarTickets(TicketStorage.obtenerTickets());
+            const tickets = TicketStorage.obtenerTickets();
+            if (tickets === null) {
+                alert('No se pudieron leer los tickets guardados.');
+            }
+            DireccionVista.mostrarTickets(tickets || []);
         }
 
         if (tablaSolicitudes) {
-            DireccionVista.mostrarSolicitudes(SolicitudProgramaStorage.obtenerSolicitudes());
+            const solicitudes = SolicitudProgramaStorage.obtenerSolicitudes();
+            if (solicitudes === null) {
+                alert('No se pudieron leer las solicitudes guardadas.');
+            }
+            DireccionVista.mostrarSolicitudes(solicitudes || []);
         }
     }
 

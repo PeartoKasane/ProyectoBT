@@ -17,6 +17,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const formulario = document.getElementById("form-docente");
 
+    function obtenerTickets() {
+        const tickets = TicketStorage.obtenerTickets();
+        if (tickets === null) {
+            DocenteVista.mostrarMensaje("No se pudieron leer los tickets guardados.");
+            return [];
+        }
+
+        return tickets;
+    }
+
     formulario.addEventListener("submit", function (event) {
 
         event.preventDefault();
@@ -26,6 +36,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // Obtener equipos desde la vista
         const equipos = DocenteVista.obtenerEquipos();
+
+        const validacionTicket = TicketServicio.validarDatos({
+            ...datosFormulario,
+            equipos
+        });
+
+        if (validacionTicket) {
+            DocenteVista.mostrarMensaje(validacionTicket);
+            return;
+        }
 
         // Validar equipos con el servicio de incidencias
         const validacion = IncidenciaServicio.validarEquiposConIncidencias(equipos);
@@ -66,22 +86,25 @@ document.addEventListener("DOMContentLoaded", () => {
             "Pendiente"
         );
 
-        TicketStorage.agregarTicket(ticket);
+        if (!TicketStorage.agregarTicket(ticket)) {
+            DocenteVista.mostrarMensaje("No se pudo guardar el ticket.");
+            return;
+        }
 
         DocenteVista.mostrarMensaje("Ticket generado correctamente.");
 
         // Limpiar formulario y refrescar historial
         DocenteVista.limpiarFormulario();
-        DocenteVista.renderHistorialTickets(TicketStorage.obtenerTickets(), usuarioActual);
+        DocenteVista.renderHistorialTickets(obtenerTickets(), usuarioActual);
     });
 
     // Mostrar historial al cargar la página
-    DocenteVista.renderHistorialTickets(TicketStorage.obtenerTickets(), usuarioActual);
+    DocenteVista.renderHistorialTickets(obtenerTickets(), usuarioActual);
 
     // Escuchar cambios en localStorage desde otras pestañas/ventanas
     window.addEventListener('storage', (e) => {
         if (e.key === 'tickets') {
-            DocenteVista.renderHistorialTickets(TicketStorage.obtenerTickets(), usuarioActual);
+            DocenteVista.renderHistorialTickets(obtenerTickets(), usuarioActual);
         }
     });
 });

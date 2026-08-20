@@ -23,12 +23,88 @@ class TicketServicio {
         "Terminado"
     ];
 
+    static SALAS_VALIDAS = {
+        laboratorio: ["1", "2", "3", "4", "5", "6"],
+        taller: ["1", "2", "3"]
+    };
+
+    static TURNOS_VALIDOS = ["M", "V", "N"];
+
+    static validarDatos(datos) {
+        const ticket = datos || {};
+        const camposObligatorios = [
+            ["tipoSala", "Falta seleccionar el tipo de sala."],
+            ["numeroSala", "Falta seleccionar el número de sala."],
+            ["fecha", "Falta completar la fecha."],
+            ["horaEntrada", "Falta completar la hora de entrada."],
+            ["horaSalida", "Falta completar la hora de salida."],
+            ["asignatura", "Falta completar la asignatura."],
+            ["docente", "Falta completar el nombre del docente."],
+            ["grupo", "Falta completar el grupo."],
+            ["turno", "Falta seleccionar el turno."]
+        ];
+
+        for (const [campo, mensaje] of camposObligatorios) {
+            if (typeof ticket[campo] !== "string" || !ticket[campo].trim()) {
+                return mensaje;
+            }
+        }
+
+        if (!Array.isArray(ticket.equipos) || ticket.equipos.length === 0) {
+            return "Debe indicar al menos un equipo.";
+        }
+
+        if (!this.esSalaValida(ticket.tipoSala, ticket.numeroSala)) {
+            return "La sala seleccionada no es válida.";
+        }
+
+        if (!this.TURNOS_VALIDOS.includes(ticket.turno.trim())) {
+            return "El turno seleccionado no es válido.";
+        }
+
+        if (!this.esFechaValida(ticket.fecha)) {
+            return "La fecha no tiene un formato válido.";
+        }
+
+        if (!this.esHoraValida(ticket.horaEntrada) || !this.esHoraValida(ticket.horaSalida)) {
+            return "Las horas no tienen un formato válido.";
+        }
+
+        if (ticket.horaSalida <= ticket.horaEntrada) {
+            return "La hora de salida debe ser posterior a la hora de entrada.";
+        }
+
+        return "";
+    }
+
+    static esSalaValida(tipoSala, numeroSala) {
+        const tipo = String(tipoSala).trim();
+        const numero = String(numeroSala).trim();
+        return Array.isArray(this.SALAS_VALIDAS[tipo]) && this.SALAS_VALIDAS[tipo].includes(numero);
+    }
+
+    static esFechaValida(fecha) {
+        if (typeof fecha !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(fecha)) {
+            return false;
+        }
+
+        const [anio, mes, dia] = fecha.split("-").map(Number);
+        const fechaVerificada = new Date(Date.UTC(anio, mes - 1, dia));
+        return fechaVerificada.getUTCFullYear() === anio &&
+            fechaVerificada.getUTCMonth() === mes - 1 &&
+            fechaVerificada.getUTCDate() === dia;
+    }
+
+    static esHoraValida(hora) {
+        return typeof hora === "string" && /^(?:[01]\d|2[0-3]):[0-5]\d$/.test(hora);
+    }
+
     static obtenerIncidencias(ticket) {
         if (!ticket || !Array.isArray(ticket.equipos)) {
             return [];
         }
 
-        return ticket.equipos.filter(equipo => equipo && equipo.incidencia);
+        return ticket.equipos.filter(equipo => Equipo.esIncidencia(equipo));
     }
 
     static obtenerIncidenciasTexto(ticket) {
@@ -104,11 +180,13 @@ class TicketServicio {
             return estado;
         }
 
-        return "Pendiente";
+        return null;
     }
 
     static validarEstado(estado) {
-        return this.ESTADOS_VALIDOS.includes(this.normalizarEstado(estado));
+        return estado === "Realizado" ||
+            estado === "Finalizado" ||
+            this.ESTADOS_VALIDOS.includes(estado);
     }
 
     static buscarTicketPorId(tickets, id) {

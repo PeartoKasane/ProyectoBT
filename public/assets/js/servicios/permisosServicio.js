@@ -197,19 +197,53 @@ class PermisoServicio {
         // esto chequea si el usuario puede entrar a una pagina concreta
         const usuario = this.obtenerSesionUsuario();
 
-        if (!usuario) {
-            return true;
+        if (!usuario || !usuario.cedula || !usuario.nombre) {
+            alert('Debes iniciar sesión para acceder.');
+            window.location.href = 'index.html';
+            return false;
         }
 
-        const roles = this.normalizarRoles(usuario.roles);
+        const roles = Array.isArray(usuario.roles)
+            ? this.normalizarRoles(usuario.roles)
+            : [];
+
+        if (roles.length === 0) {
+            alert('La sesión no es válida.');
+            window.location.href = 'index.html';
+            return false;
+        }
+
         const rolRequerido = this.PERMISOS_POR_VENTANA[nombreVentana] || nombreVentana;
 
         if (!this.puedeAccederVentana(roles, rolRequerido)) {
             alert('No tiene permiso para acceder a esta ventana.');
-            const rolPrincipal = this.obtenerRolPrincipal(roles);
-            const destino = this.obtenerRutaVentana(rolPrincipal);
-            window.location.href = destino || 'index.html';
+            window.location.href = 'index.html';
             return false;
+        }
+
+        if (!this._sesionVigilada) {
+            this._sesionVigilada = true;
+            window.addEventListener('storage', (evento) => {
+                if (evento.key !== this.SESION_KEY) {
+                    return;
+                }
+
+                let nuevaSesion = null;
+                try {
+                    nuevaSesion = evento.newValue ? JSON.parse(evento.newValue) : null;
+                } catch (error) {
+                    nuevaSesion = null;
+                }
+
+                const nuevosRoles = nuevaSesion && Array.isArray(nuevaSesion.roles)
+                    ? this.normalizarRoles(nuevaSesion.roles)
+                    : [];
+
+                if (!nuevaSesion || !nuevaSesion.cedula || !nuevaSesion.nombre ||
+                    nuevosRoles.length === 0 || !this.puedeAccederVentana(nuevosRoles, rolRequerido)) {
+                    window.location.href = 'index.html';
+                }
+            });
         }
 
         return true;

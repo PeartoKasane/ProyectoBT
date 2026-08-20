@@ -5,20 +5,34 @@
 */
 
 document.addEventListener("DOMContentLoaded", () => {
+    if (!PermisoServicio.validarAccesoPagina("Administrador")) {
+        return;
+    }
+
     const tabla = document.getElementById("registro_tickets");
     const modalEstado = document.getElementById("modal-cambiar-estado");
     const ticketSeleccionado = document.getElementById("ticketSeleccionado");
     const nuevoEstado = document.getElementById("nuevoEstado");
     const formularioEstado = document.getElementById("form-cambiar-estado");
 
+    function obtenerTickets() {
+        const tickets = TicketStorage.obtenerTickets();
+        if (tickets === null) {
+            alert("No se pudieron leer los tickets guardados.");
+            return [];
+        }
+
+        return tickets;
+    }
+
     function recargarTabla() {
-        AdminVista.mostrarTickets(TicketStorage.obtenerTickets());
+        AdminVista.mostrarTickets(obtenerTickets());
     }
 
     function prepararModalEstado() {
         // Volvemos a cargar los tickets para que el modal
         // muestre siempre lo que está guardado.
-        AdminVista.rellenarSelectorTicket(TicketStorage.obtenerTickets());
+        AdminVista.rellenarSelectorTicket(obtenerTickets());
         const actual = document.getElementById("estadoActual");
         if (actual) {
             actual.textContent = "Sin ticket seleccionado";
@@ -62,17 +76,25 @@ document.addEventListener("DOMContentLoaded", () => {
                 return;
             }
 
+            if (!TicketServicio.validarEstado(estadoNuevo)) {
+                alert("El estado seleccionado no es válido.");
+                return;
+            }
+
             const estadoNormalizado = TicketServicio.normalizarEstado(estadoNuevo);
             const nuevoTicket = TicketStorage.actualizarTicket(idTicket, {
                 estado: estadoNormalizado
             });
 
-            if (nuevoTicket) {
-                recargarTabla();
-                const modal = bootstrap.Modal.getInstance(modalEstado);
-                if (modal) {
-                    modal.hide();
-                }
+            if (!nuevoTicket) {
+                alert("No se pudo actualizar el ticket.");
+                return;
+            }
+
+            recargarTabla();
+            const modal = bootstrap.Modal.getInstance(modalEstado);
+            if (modal) {
+                modal.hide();
             }
         });
     }
@@ -97,7 +119,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 return;
             }
 
-            TicketStorage.eliminarTicket(idTicket);
+            if (!TicketStorage.eliminarTicket(idTicket)) {
+                alert("No se pudo eliminar el ticket.");
+                return;
+            }
+
             recargarTabla();
         });
     }

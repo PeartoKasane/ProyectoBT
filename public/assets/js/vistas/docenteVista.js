@@ -87,29 +87,47 @@ class DocenteVista {
         });
 
         // Construir filas
-        const filas = ticketsFiltrados.map(ticket => {
+        tbody.replaceChildren();
+
+        if (ticketsFiltrados.length === 0) {
+            const filaVacia = document.createElement("tr");
+            const celdaVacia = document.createElement("td");
+            celdaVacia.colSpan = 10;
+            celdaVacia.textContent = "No hay tickets registrados para este docente.";
+            filaVacia.appendChild(celdaVacia);
+            tbody.appendChild(filaVacia);
+            return;
+        }
+
+        ticketsFiltrados.forEach(ticket => {
             const descripcion = TicketServicio.obtenerIncidenciasTexto(ticket);
             const horaSalida = ticket.horaSalida || '';
             const prioridad = TicketServicio.obtenerPrioridad(ticket);
             const estado = TicketServicio.normalizarEstado(ticket.estado);
 
-            return `
-                <tr>
-                    <td class="text-center">${ticket.id}</td>
-                    <td>${ticket.docente || ''}</td>
-                    <td>${ticket.tipoSala || ''}</td>
-                    <td>${ticket.numeroSala || ''}</td>
-                    <td>${ticket.fecha || ''}</td>
-                    <td>${ticket.horaEntrada || ''}</td>
-                    <td>${horaSalida}</td>
-                    <td class="text-center">${prioridad}</td>
-                    <td>${estado}</td>
-                    <td>${descripcion}</td>
-                </tr>
-            `;
-        }).join('\n');
+            const fila = document.createElement("tr");
+            const valores = [
+                [ticket.id, "text-center"],
+                [ticket.docente || "", ""],
+                [ticket.tipoSala || "", ""],
+                [ticket.numeroSala || "", ""],
+                [ticket.fecha || "", ""],
+                [ticket.horaEntrada || "", ""],
+                [horaSalida, ""],
+                [prioridad, "text-center"],
+                [estado || "", ""],
+                [descripcion, ""]
+            ];
 
-        tbody.innerHTML = filas || '<tr><td colspan="10">No hay tickets registrados para este docente.</td></tr>';
+            valores.forEach(([valor, clase]) => {
+                const celda = document.createElement("td");
+                celda.className = clase;
+                celda.textContent = String(valor);
+                fila.appendChild(celda);
+            });
+
+            tbody.appendChild(fila);
+        });
     }
 }
 

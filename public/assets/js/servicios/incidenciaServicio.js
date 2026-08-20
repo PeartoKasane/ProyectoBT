@@ -11,7 +11,7 @@ class IncidenciaServicio {
 
     static validarEquiposConIncidencias(equipos) {
         for (const equipo of equipos) {
-            if (equipo.tieneIncidencia() && equipo.estudiante.trim() === "") {
+            if (equipo.tieneIncidencia() && String(equipo.estudiante || "").trim() === "") {
                 return {
                     valido: false,
                     mensaje: `Debe indicar el nombre del estudiante del equipo ${equipo.numero}.`

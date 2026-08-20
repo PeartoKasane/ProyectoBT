@@ -13,6 +13,12 @@ class Equipo {
     }
 
     tieneIncidencia() {
-        return this.estado === "incidencia";
+        return Equipo.esIncidencia(this);
+    }
+
+    static esIncidencia(equipo) {
+        return equipo?.estado === "incidencia" || Boolean(equipo?.incidencia);
     }
 }
+
+globalThis.Equipo = Equipo;

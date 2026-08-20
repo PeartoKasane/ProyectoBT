@@ -23,7 +23,7 @@
             <div class="navbar-nav ms-auto d-flex align-items-center gap-2">
                 <!-- Lugar donde el JS inyecta el selector/ventana del usuario -->
                 <div id="selectorVentanaUsuario" class="d-flex gap-2"></div>
-                <a class="btn btn-outline-danger btn-sm fw-bold" href="index.html" onclick="localStorage.removeItem('sesionUsuario');">Cerrar Sesión</a>
+                <a class="btn btn-outline-danger btn-sm fw-bold" href="index.html" onclick="localStorage.removeItem('sesionUsuario'); location.replace('index.html'); return false;">Cerrar Sesión</a>
             </div>
         </div>
     </nav>

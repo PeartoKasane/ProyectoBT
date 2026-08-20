@@ -8,8 +8,23 @@ document.addEventListener("DOMContentLoaded", () => {
     const formularioSolicitud = document.getElementById("form-solicitud-programa");
     const tablaSolicitudes = document.getElementById("registro_solicitudes");
 
+    if (formularioSolicitud && !PermisoServicio.validarAccesoPagina("Docente")) {
+        return;
+    }
+
+    if (!formularioSolicitud && tablaSolicitudes && !PermisoServicio.validarAccesoPagina("Administrador")) {
+        return;
+    }
+
     function recargarTablaSolicitudes() {
-        SolicitudProgramaVista.mostrarSolicitudes(SolicitudProgramaStorage.obtenerSolicitudes());
+        const solicitudes = SolicitudProgramaStorage.obtenerSolicitudes();
+        if (solicitudes === null) {
+            SolicitudProgramaVista.mostrarMensaje("No se pudieron leer las solicitudes guardadas.");
+            SolicitudProgramaVista.mostrarSolicitudes([]);
+            return;
+        }
+
+        SolicitudProgramaVista.mostrarSolicitudes(solicitudes);
     }
 
     if (formularioSolicitud) {
@@ -36,7 +51,10 @@ document.addEventListener("DOMContentLoaded", () => {
             );
 
             // Guardo la solicitud para que después aparezca en la tabla de administración.
-            SolicitudProgramaStorage.agregarSolicitud(solicitud);
+            if (!SolicitudProgramaStorage.agregarSolicitud(solicitud)) {
+                SolicitudProgramaVista.mostrarMensaje("No se pudo guardar la solicitud.");
+                return;
+            }
 
             SolicitudProgramaVista.mostrarMensaje("Solicitud enviada correctamente.");
             SolicitudProgramaVista.limpiarFormulario();
@@ -62,9 +80,14 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
             const estadoNormalizado = SolicitudProgramaServicio.normalizarEstado(estadoNuevo);
-            SolicitudProgramaStorage.actualizarSolicitud(idSolicitud, {
+            const solicitudActualizada = SolicitudProgramaStorage.actualizarSolicitud(idSolicitud, {
                 estado: estadoNormalizado
             });
+
+            if (!solicitudActualizada) {
+                SolicitudProgramaVista.mostrarMensaje("No se pudo actualizar la solicitud.");
+                return;
+            }
 
             recargarTablaSolicitudes();
         });

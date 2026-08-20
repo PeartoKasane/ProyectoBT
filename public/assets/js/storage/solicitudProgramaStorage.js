@@ -7,27 +7,49 @@
 class SolicitudProgramaStorage {
 
     static obtenerSolicitudes() {
-        const solicitudesGuardadas = localStorage.getItem("solicitudesPrograma");
-        return solicitudesGuardadas ? JSON.parse(solicitudesGuardadas) : [];
+        try {
+            const solicitudesGuardadas = localStorage.getItem("solicitudesPrograma");
+            if (!solicitudesGuardadas) {
+                return [];
+            }
+
+            const solicitudes = JSON.parse(solicitudesGuardadas);
+            return Array.isArray(solicitudes) ? solicitudes : null;
+        } catch (error) {
+            return null;
+        }
     }
 
     static guardarSolicitudes(solicitudes) {
-        localStorage.setItem("solicitudesPrograma", JSON.stringify(solicitudes));
+        try {
+            localStorage.setItem("solicitudesPrograma", JSON.stringify(solicitudes));
+            return true;
+        } catch (error) {
+            return false;
+        }
     }
 
     static agregarSolicitud(solicitud) {
         const solicitudes = this.obtenerSolicitudes();
+        if (!solicitudes) {
+            return null;
+        }
+
         solicitudes.push(solicitud);
-        this.guardarSolicitudes(solicitudes);
-        return solicitud;
+        return this.guardarSolicitudes(solicitudes) ? solicitud : null;
     }
 
     static buscarSolicitudPorId(id) {
-        return this.obtenerSolicitudes().find(solicitud => Number(solicitud.id) === Number(id));
+        const solicitudes = this.obtenerSolicitudes();
+        return solicitudes ? solicitudes.find(solicitud => Number(solicitud.id) === Number(id)) : null;
     }
 
     static actualizarSolicitud(id, cambios) {
         const solicitudes = this.obtenerSolicitudes();
+        if (!solicitudes) {
+            return null;
+        }
+
         const indice = solicitudes.findIndex(solicitud => Number(solicitud.id) === Number(id));
 
         if (indice === -1) {
@@ -39,14 +61,17 @@ class SolicitudProgramaStorage {
             ...cambios
         };
 
-        this.guardarSolicitudes(solicitudes);
-        return solicitudes[indice];
+        return this.guardarSolicitudes(solicitudes) ? solicitudes[indice] : null;
     }
 
     static eliminarSolicitud(id) {
-        const solicitudesActualizadas = this.obtenerSolicitudes().filter(solicitud => Number(solicitud.id) !== Number(id));
-        this.guardarSolicitudes(solicitudesActualizadas);
-        return solicitudesActualizadas;
+        const solicitudes = this.obtenerSolicitudes();
+        if (!solicitudes) {
+            return null;
+        }
+
+        const solicitudesActualizadas = solicitudes.filter(solicitud => Number(solicitud.id) !== Number(id));
+        return this.guardarSolicitudes(solicitudesActualizadas) ? solicitudesActualizadas : null;
     }
 }
 

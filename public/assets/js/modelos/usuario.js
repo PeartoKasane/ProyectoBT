@@ -5,11 +5,12 @@
 */
 
 class Usuario {
-    constructor(cedula, nombre, roles = [], contrasena = '') {
+    constructor(cedula, nombre, roles = [], passwordHash = '', passwordSalt = '') {
         this.cedula = cedula;
         this.nombre = nombre;
         this.roles = Array.isArray(roles) ? roles : [];
-        this.contrasena = contrasena;
+      this.passwordHash = passwordHash;
+      this.passwordSalt = passwordSalt;
     }
 }
 

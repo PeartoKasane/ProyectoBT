@@ -56,25 +56,39 @@ class AdminVista {
     }
 
     static generarDetalleTicket(ticket) {
-        const incidencias = TicketServicio.obtenerIncidencias(ticket);
         const descripcion = TicketServicio.obtenerIncidenciasTexto(ticket);
         const estudiantes = TicketServicio.obtenerEstudiantesTexto(ticket);
         const equipos = TicketServicio.obtenerEquiposTexto(ticket);
 
-        // `infoTicket`: contenedor que agrupa toda la info del ticket (alineada a la izquierda)
-        // `datosTicket`: cada línea de información dentro del contenedor (Incidencia, Equipo, Estudiante, ID)
-        // El botón "Eliminar" está dentro del mismo contenedor para que se relacione visualmente con los datos.
-        return `
-            <div class="infoTicket text-start">
-                <div class="datosTicket"><strong>Incidencia:</strong> ${descripcion}</div>
-                <div class="datosTicket"><strong>Equipo:</strong> ${equipos}</div>
-                <div class="datosTicket"><strong>Estudiante:</strong> ${estudiantes}</div>
-                <div class="datosTicket"><strong>ID:</strong> #${ticket.id}</div>
-                <button type="button" class="botonEliminar btn btn-link btn-sm text-danger p-0 mt-2" data-ticket-id="${ticket.id}" aria-label="Eliminar ticket ${ticket.id}">
-                    Eliminar
-                </button>
-            </div>
-        `;
+        const contenedor = document.createElement("div");
+        contenedor.className = "infoTicket text-start";
+
+        const datos = [
+            ["Incidencia:", descripcion],
+            ["Equipo:", equipos],
+            ["Estudiante:", estudiantes],
+            ["ID:", `#${ticket.id}`]
+        ];
+
+        datos.forEach(([etiqueta, valor]) => {
+            const linea = document.createElement("div");
+            linea.className = "datosTicket";
+
+            const titulo = document.createElement("strong");
+            titulo.textContent = etiqueta;
+            linea.append(titulo, document.createTextNode(` ${valor}`));
+            contenedor.appendChild(linea);
+        });
+
+        const boton = document.createElement("button");
+        boton.type = "button";
+        boton.className = "botonEliminar btn btn-link btn-sm text-danger p-0 mt-2";
+        boton.dataset.ticketId = String(ticket.id);
+        boton.setAttribute("aria-label", `Eliminar ticket ${ticket.id}`);
+        boton.textContent = "Eliminar";
+        contenedor.appendChild(boton);
+
+        return contenedor;
     }
 
     static rellenarSelectorTicket(tickets) {
@@ -86,9 +100,19 @@ class AdminVista {
 
         const lista = Array.isArray(tickets) ? tickets : [];
 
-        select.innerHTML = `<option value="">Selecciona un ticket</option>` + lista.map(ticket => `
-            <option value="${ticket.id}">${ticket.id} - ${this.obtenerSala(ticket)}</option>
-        `).join("");
+        select.replaceChildren();
+
+        const opcionInicial = document.createElement("option");
+        opcionInicial.value = "";
+        opcionInicial.textContent = "Selecciona un ticket";
+        select.appendChild(opcionInicial);
+
+        lista.forEach(ticket => {
+            const opcion = document.createElement("option");
+            opcion.value = String(ticket.id);
+            opcion.textContent = `${ticket.id} - ${this.obtenerSala(ticket)}`;
+            select.appendChild(opcion);
+        });
     }
 
     static actualizarEstadoActual(ticketId) {
@@ -108,37 +132,52 @@ class AdminVista {
             return;
         }
 
-        tabla.innerHTML = "";
+        tabla.replaceChildren();
 
         const lista = Array.isArray(tickets) ? tickets : [];
 
         if (lista.length === 0) {
-            tabla.innerHTML = `
-                <tr>
-                    <td colspan="4" class="text-muted py-4">No hay tickets registrados.</td>
-                </tr>
-            `;
+            const filaVacia = document.createElement("tr");
+            const celdaVacia = document.createElement("td");
+            celdaVacia.colSpan = 4;
+            celdaVacia.className = "text-muted py-4";
+            celdaVacia.textContent = "No hay tickets registrados.";
+            filaVacia.appendChild(celdaVacia);
+            tabla.appendChild(filaVacia);
             return;
         }
 
-        tabla.innerHTML = lista.map(ticket => {
+        lista.forEach(ticket => {
             const prioridad = Number(TicketServicio.obtenerPrioridad(ticket));
             const clasePrioridad = this.obtenerClasePrioridad(prioridad);
             const estado = TicketServicio.normalizarEstado(ticket.estado);
             const claseEstado = this.obtenerEstadoClase(estado);
 
-            return `
-                <tr data-ticket-id="${ticket.id}">
-                    <td class="fw-semibold">${this.obtenerSala(ticket)}</td>
-                    <td class="fw-semibold">${this.generarDetalleTicket(ticket)}</td>
-                    <td>
-                        <span class="badge ${clasePrioridad} fs-6 px-3">${prioridad}</span>
-                    </td>
-                    <td>
-                        <span class="badge ${claseEstado} fs-6 px-3">${estado}</span>
-                    </td>
-                </tr>
-            `;
-        }).join("");
+            const fila = document.createElement("tr");
+            fila.dataset.ticketId = String(ticket.id);
+
+            const sala = document.createElement("td");
+            sala.className = "fw-semibold";
+            sala.textContent = this.obtenerSala(ticket);
+
+            const detalle = document.createElement("td");
+            detalle.className = "fw-semibold";
+            detalle.appendChild(this.generarDetalleTicket(ticket));
+
+            const prioridadCelda = document.createElement("td");
+            const prioridadBadge = document.createElement("span");
+            prioridadBadge.className = `badge ${clasePrioridad} fs-6 px-3`;
+            prioridadBadge.textContent = String(prioridad);
+            prioridadCelda.appendChild(prioridadBadge);
+
+            const estadoCelda = document.createElement("td");
+            const estadoBadge = document.createElement("span");
+            estadoBadge.className = `badge ${claseEstado} fs-6 px-3`;
+            estadoBadge.textContent = estado || "";
+            estadoCelda.appendChild(estadoBadge);
+
+            fila.append(sala, detalle, prioridadCelda, estadoCelda);
+            tabla.appendChild(fila);
+        });
     }
 }
