@@ -5,11 +5,13 @@
 */
 
 class Equipo {
-    constructor(numero, estudiante = "", estado = "funcionando", incidencia = "") {
+    constructor(numero, estudiante = "", estado = "funcionando", incidencia = "", utilizado = false) {
         this.numero = numero;
         this.estudiante = estudiante;
         this.estado = estado;
         this.incidencia = incidencia;
+        // Guardamos el uso por separado para no confundirlo con una incidencia.
+        this.utilizado = Boolean(utilizado);
     }
 
     tieneIncidencia() {
@@ -17,7 +19,7 @@ class Equipo {
     }
 
     static esIncidencia(equipo) {
-        return equipo?.estado === "incidencia" || Boolean(equipo?.incidencia);
+        return equipo?.estado === "incidencia" && Boolean(String(equipo?.incidencia || "").trim());
     }
 }
 

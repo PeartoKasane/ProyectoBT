@@ -35,6 +35,12 @@ class Ticket {
         this.equipos = equipos;
         this.prioridad = prioridad;
         this.estado = estado;
+        // Estos campos permiten consultar rápidamente el equipo de esta incidencia.
+        const equipo = Array.isArray(equipos) ? equipos[0] : null;
+        this.equipoId = equipo ? equipo.numero : null;
+        this.estudiante = equipo ? equipo.estudiante || "" : "";
+        this.tipoIncidencia = equipo ? equipo.incidencia || "" : "";
+        this.descripcion = this.tipoIncidencia;
     }
 }
 

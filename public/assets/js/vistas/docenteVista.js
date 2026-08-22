@@ -6,6 +6,51 @@
 
 class DocenteVista {
 
+    static prepararRegistroEquipos() {
+        const filas = document.querySelectorAll("#registro_salas tr");
+        const encabezado = document.querySelector(".th-estado-equipo");
+
+        // Agregamos un selector de uso y dejamos la incidencia como una decisión independiente.
+        if (encabezado) {
+            encabezado.textContent = "Uso e incidencia";
+        }
+
+        filas.forEach(fila => {
+            const estudiante = fila.querySelector(".nombre-estudiante");
+            const selectorIncidencia = fila.querySelector(".estado-equipo");
+
+            if (!estudiante || !selectorIncidencia || fila.querySelector(".uso-equipo")) {
+                return;
+            }
+
+            const selectorUso = document.createElement("select");
+            selectorUso.className = "form-select uso-equipo mb-2";
+            selectorUso.innerHTML = `
+                <option value="no">No fue utilizado</option>
+                <option value="si">Fue utilizado</option>`;
+            estudiante.parentElement.insertBefore(selectorUso, estudiante);
+
+            const opcionSinIncidencia = document.createElement("option");
+            opcionSinIncidencia.value = "ok";
+            opcionSinIncidencia.textContent = "Sin incidencia";
+            selectorIncidencia.insertBefore(opcionSinIncidencia, selectorIncidencia.firstChild);
+            selectorIncidencia.value = "ok";
+
+            const actualizarEstudiante = () => {
+                const fueUtilizado = selectorUso.value === "si";
+                estudiante.disabled = !fueUtilizado;
+                estudiante.required = fueUtilizado && selectorIncidencia.value === "incidencia";
+                if (!fueUtilizado) {
+                    estudiante.value = "";
+                }
+            };
+
+            selectorUso.addEventListener("change", actualizarEstudiante);
+            selectorIncidencia.addEventListener("change", actualizarEstudiante);
+            actualizarEstudiante();
+        });
+    }
+
     static obtenerDatosFormulario() {
         return {
             tipoSala: document.getElementById("tipo_sala").value,
@@ -31,6 +76,9 @@ class DocenteVista {
             const estudiante =
                 fila.querySelector(".nombre-estudiante").value.trim();
 
+            const utilizado =
+                fila.querySelector(".uso-equipo").value === "si";
+
             const selectEstado =
                 fila.querySelector(".estado-equipo");
 
@@ -46,7 +94,8 @@ class DocenteVista {
                     numero,
                     estudiante,
                     estado,
-                    incidencia
+                    incidencia,
+                    utilizado
                 )
             );
         });
@@ -60,6 +109,10 @@ class DocenteVista {
 
     static limpiarFormulario() {
         document.getElementById("form-docente").reset();
+        // El reset no dispara change, así que restauramos el estado de los estudiantes.
+        document.querySelectorAll(".uso-equipo").forEach(selector => {
+            selector.dispatchEvent(new Event("change"));
+        });
     }
 
     static renderHistorialTickets(tickets, usuarioActual) {

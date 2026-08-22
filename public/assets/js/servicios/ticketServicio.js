@@ -190,7 +190,8 @@ class TicketServicio {
     }
 
     static buscarTicketPorId(tickets, id) {
-        return tickets.find(ticket => Number(ticket.id) === Number(id));
+        // El ID puede ser numérico o tener el formato texto de los tickets nuevos.
+        return tickets.find(ticket => String(ticket.id).trim() === String(id).trim());
     }
 
     static tieneIncidencias(ticket) {

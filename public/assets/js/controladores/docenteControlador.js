@@ -16,6 +16,15 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     const formulario = document.getElementById("form-docente");
+    const botonEnviar = formulario.querySelector('button[type="submit"]');
+    let enviandoFormulario = false;
+
+    const habilitarEnvio = () => {
+        enviandoFormulario = false;
+        if (botonEnviar) {
+            botonEnviar.disabled = false;
+        }
+    };
 
     function obtenerTickets() {
         const tickets = TicketStorage.obtenerTickets();
@@ -31,6 +40,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
         event.preventDefault();
 
+        if (enviandoFormulario) {
+            return;
+        }
+
+        enviandoFormulario = true;
+        if (botonEnviar) {
+            botonEnviar.disabled = true;
+        }
+
         // Obtener datos de la interfaz
         const datosFormulario = DocenteVista.obtenerDatosFormulario();
 
@@ -44,6 +62,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (validacionTicket) {
             DocenteVista.mostrarMensaje(validacionTicket);
+            habilitarEnvio();
             return;
         }
 
@@ -52,24 +71,43 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (!validacion.valido) {
             DocenteVista.mostrarMensaje(validacion.mensaje);
+            habilitarEnvio();
             return;
         }
 
-        // Preparar solo los equipos que tienen incidencias
+        // Guardar el uso de todos los equipos, aunque ninguno tenga incidencia.
+        const registroUso = {
+            id: Date.now(),
+            ...datosFormulario,
+            docenteCedula: usuarioActual && usuarioActual.cedula ? usuarioActual.cedula : null,
+            equipos: equipos.map(equipo => ({
+                numero: equipo.numero,
+                estudiante: equipo.utilizado ? equipo.estudiante : "",
+                utilizado: equipo.utilizado,
+                incidencia: equipo.tieneIncidencia() ? equipo.incidencia : ""
+            }))
+        };
+
+        if (!UsoEquipoStorage.agregarRegistro(registroUso)) {
+            DocenteVista.mostrarMensaje("No se pudo guardar el registro de uso.");
+            habilitarEnvio();
+            return;
+        }
+
+        // Preparar solo los equipos que tienen incidencias.
         const equiposConIncidencia = IncidenciaServicio.prepararEquiposConIncidencias(equipos);
 
-        // No generar ticket si no hay incidencias
+        // No generar tickets si no hay incidencias, pero conservar el registro de uso.
         if (equiposConIncidencia.length === 0) {
-            DocenteVista.mostrarMensaje("No hay equipos con incidencias para reportar.");
+            DocenteVista.mostrarMensaje("Uso de equipos registrado. No hay incidencias para reportar.");
+            DocenteVista.limpiarFormulario();
+            habilitarEnvio();
             return;
         }
 
-        // Crear ticket y guardarlo con la prioridad 
-        // de la incidencia reportada por el docente.
-        const prioridad = TicketServicio.obtenerPrioridadDesdeIncidencias(equiposConIncidencia);
-
-        const ticket = new Ticket(
-            Date.now(),
+        // Una incidencia de la lista se convierte en un ticket independiente.
+        const tickets = equiposConIncidencia.map((equipo, indice) => new Ticket(
+            `${Date.now()}-${indice}`,
             datosFormulario.tipoSala,
             datosFormulario.numeroSala,
             datosFormulario.fecha,
@@ -77,17 +115,17 @@ document.addEventListener("DOMContentLoaded", () => {
             datosFormulario.horaSalida,
             datosFormulario.asignatura,
             datosFormulario.docente,
-            // guardar la cédula del docente para identificación única
             usuarioActual && usuarioActual.cedula ? usuarioActual.cedula : null,
             datosFormulario.grupo,
             datosFormulario.turno,
-            equiposConIncidencia,
-            prioridad,
+            [equipo],
+            TicketServicio.obtenerPrioridadDesdeIncidencias([equipo]),
             "Pendiente"
-        );
+        ));
 
-        if (!TicketStorage.agregarTicket(ticket)) {
+        if (!TicketStorage.agregarTickets(tickets)) {
             DocenteVista.mostrarMensaje("No se pudo guardar el ticket.");
+            habilitarEnvio();
             return;
         }
 
@@ -96,7 +134,10 @@ document.addEventListener("DOMContentLoaded", () => {
         // Limpiar formulario y refrescar historial
         DocenteVista.limpiarFormulario();
         DocenteVista.renderHistorialTickets(obtenerTickets(), usuarioActual);
+        habilitarEnvio();
     });
+
+    DocenteVista.prepararRegistroEquipos();
 
     // Mostrar historial al cargar la página
     DocenteVista.renderHistorialTickets(obtenerTickets(), usuarioActual);

@@ -6,6 +6,11 @@
 
 class TicketStorage {
 
+    static idsIguales(idTicket, idBuscado) {
+        // Comparamos como texto para aceptar IDs antiguos numéricos y los nuevos con guion.
+        return String(idTicket).trim() === String(idBuscado).trim();
+    }
+
     static obtenerTickets() {
         try {
             const ticketsGuardados = localStorage.getItem("tickets");
@@ -39,9 +44,26 @@ class TicketStorage {
         return this.guardarTickets(tickets) ? ticket : null;
     }
 
+    static agregarTickets(ticketsNuevos) {
+        const tickets = this.obtenerTickets();
+        if (!tickets || !Array.isArray(ticketsNuevos) || ticketsNuevos.length === 0) {
+            return null;
+        }
+
+        // Guardamos todas las incidencias juntas para que no quede un envío a medias.
+        const idsExistentes = new Set(tickets.map(ticket => String(ticket.id)));
+        const hayIdRepetido = ticketsNuevos.some(ticket => idsExistentes.has(String(ticket.id)));
+        if (hayIdRepetido) {
+            return null;
+        }
+
+        const ticketsActualizados = tickets.concat(ticketsNuevos);
+        return this.guardarTickets(ticketsActualizados) ? ticketsNuevos : null;
+    }
+
     static buscarTicketPorId(id) {
         const tickets = this.obtenerTickets();
-        return tickets ? tickets.find(ticket => Number(ticket.id) === Number(id)) : null;
+        return tickets ? tickets.find(ticket => this.idsIguales(ticket.id, id)) : null;
     }
 
     static actualizarTicket(id, cambios) {
@@ -50,7 +72,7 @@ class TicketStorage {
             return null;
         }
 
-        const indice = tickets.findIndex(ticket => Number(ticket.id) === Number(id));
+        const indice = tickets.findIndex(ticket => this.idsIguales(ticket.id, id));
 
         if (indice === -1) {
             return null;
@@ -70,7 +92,7 @@ class TicketStorage {
             return null;
         }
 
-        const ticketsActualizados = tickets.filter(ticket => Number(ticket.id) !== Number(id));
+        const ticketsActualizados = tickets.filter(ticket => !this.idsIguales(ticket.id, id));
         return this.guardarTickets(ticketsActualizados) ? ticketsActualizados : null;
     }
 }
