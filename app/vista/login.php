@@ -1,137 +1,41 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8">
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>Inicio de sesión</title>
-
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.css">
-
-    <link rel="stylesheet" href="assets/css/global.css">
-
-    <link rel="stylesheet" href="assets/css/login.css">
+    <title>Login - LabCheck</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
-
-<body id="inicio">
-
-    <header class="barraNavegacion">
-        <img src="assets/img/imagen_generica.png" alt="Logo de la empresa" class="logo">
-
-        <h1>Todo en blanco</h1>
-
-        <nav>
-            <button class="btnMenu" id="btnMenu" type="button">
-                <img src="assets/img/list.svg" alt="Abrir menú" class="iconoMenu">
-            </button>
-
-            <button class="btnCerrarMenu" id="btnCerrarMenu" type="button">
-                <img src="assets/img/x.svg" alt="Cerrar menú" class="iconoMenu">
-            </button>
-
-            <ul class="listaNavegacion">
-                <li>
-                    <a href="index.html" class="btnNavegacion">
-                        Inicio
-                    </a>
-                </li>
-
-                <li>
-                    <a href="sobreNosotros.html" class="btnNavegacion">
-                        Sobre nosotros
-                    </a>
-                </li>
-
-                <li>
-                    <a href="contacto.html" class="btnNavegacion">
-                        Contáctanos
-                    </a>
-                </li>
-
-                <li>
-                    <a href="trabajaConNosotros.html" class="btnNavegacion">
-                        Trabaja con nosotros
-                    </a>
-                </li>
-
-                <li>
-                    <a href="login.php" class="btnNavegacion">
-                        Ingresar al sistema
-                    </a>
-                </li>
-            </ul>
-        </nav>
+<body class="bg-light d-flex flex-column min-vh-100">
+    <header class="w-100 bg-secondary text-white text-center py-4">
+        <h1 class="display-5 fw-bold">LabCheck</h1>
     </header>
 
-    <main>
-        <section class="seccionLogin">
-            <h2>Ingreso al sistema</h2>
+    <main class="container d-flex flex-grow-1 justify-content-center align-items-center my-4">
+        <section class="card shadow-sm p-4 w-100" style="max-width: 400px;">
+            <div class="card-body">
+                <h2 id="login-title" class="text-center h4 mb-3">Iniciar Sesión</h2>
+                <p class="text-muted text-center small mb-4">Ingresa tus credenciales para acceder al sistema</p>
 
-            <form action="procesarLogin.php" method="post">
-                <fieldset>
-                    <legend>Inicio de sesión</legend>
-
-                    <div class="cajaEntradaDeDatos">
-                        <label for="cedula">
-                            Cédula
-                        </label>
-
-                        <input type="text" id="cedula" name="cedula" autocomplete="username" pattern="[1-9][0-9]{7}"
-                            title="Ingrese exactamente 8 dígitos sin puntos ni guiones" inputmode="numeric"
-                            maxlength="8" required>
+                <form id="form-login" action="../app/controlador/procesarLogin.php" method="POST">
+                    <div class="mb-3">
+                        <label for="ci" class="form-label">Cédula de Identidad</label>
+                        <input type="text" class="form-control" id="ci" name="ci" placeholder="Ej: 12345678" required>
                     </div>
 
-                    <div class="cajaEntradaDeDatos">
-                        <label for="clave">
-                            Contraseña
-                        </label>
-
-                        <input type="password" id="clave" name="clave" autocomplete="current-password" minlength="12"
-                            required>
+                    <div class="mb-3">
+                        <label for="contrasena" class="form-label">Contraseña</label>
+                        <input type="password" class="form-control" id="contrasena" name="contrasena" placeholder="••••••••" required>
                     </div>
-                </fieldset>
-                <?php
-                    //htmlspecialchars: Convierte la información del parámetro a texto en bruto para que no pueda ser interpretado como un elemento HTML.
-                    //Previene insercción de código malicioso como <script>codigoMalicioso()</script> y formatos accidentales
-                    echo htmlspecialchars($_GET["error"] ?? "");
-                ?>
-                <button type="submit">
-                    Iniciar sesión
-                </button>
-            </form>
+
+                    <button type="submit" class="btn btn-primary w-100">Ingresar</button>
+                </form>
+            </div>
         </section>
-
     </main>
 
-    <a href="#inicio" class="btnSubir">
-        <i class="bi bi-caret-up-fill"></i>
-    </a>
-
-    <footer>
-        <address>
-            <a href="http://instagram.com">
-                @todoenblanco
-            </a>
-
-            <a href="tel:+45677373">
-                +4567 7373
-            </a>
-
-            <a href="tel:098318897">
-                098 318 897
-            </a>
-
-            <a href="mailto:todoenblanco@gmail.com">
-                todoenblanco@gmail.com
-            </a>
-        </address>
-
-        <p>© 2026 Todo en Blanco</p>
+    <footer class="w-100 bg-secondary text-white text-center py-3 mt-auto">
+        <p class="mb-0 small">&copy; PeartoS.A - Todos los derechos reservados</p>
     </footer>
-
-    <script src="assets/js/barraNavegacion.js"></script>
 </body>
-
 </html>

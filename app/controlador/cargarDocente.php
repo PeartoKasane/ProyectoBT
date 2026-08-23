@@ -2,7 +2,7 @@
 session_start();
 
 // Validar sesión y rol
-if (!isset($_SESSION['usuario_doc']) || strtolower($_SESSION['usuario_rol']) !== 'administrador') {
+if (!isset($_SESSION['usuario_doc']) || strtolower($_SESSION['usuario_rol']) !== 'docente') {
     header("Location: ../../public/Login.html?error=acceso_denegado");
     exit();
 }
@@ -14,6 +14,6 @@ $conectorPDO = ConectorPDO::getInstancia();
 $conexion = $conectorPDO->getConexion();
 
 $accesoDatosUsuario = new AccesoDatosUsuario($conexion);
-$usuarios = $accesoDatosUsuario->listarUsuarios(); // Ejecuta DQL/SELECT general
+$usuarioDatos = $accesoDatosUsuario->obtenerPorDocumento($_SESSION['usuario_doc']);
 
-require_once __DIR__ . "/../vista/administrador.php";
+require_once __DIR__ . "/../vista/docente.php";

@@ -1,41 +1,38 @@
 <?php
-//Instalación del driver https://www.php.net/manual/en/pdo.installation.php
-//LEER ATENTAMENTE CÓMO SE CONFIGURA TANTO EN LINUX COMO EN WINDOWS
-//Especificar en php.ini el extension_dir (debe apuntar a ext) y la extension pdo_mysql para este caso
-class ConectorPDO
-{
-    private string $servername;
-    private string $username;
-    private string $password;
-    private string $dbname;
-    private ?PDO $conexion;
+class ConectorPDO {
+    private static $instancia = null;
+    private $conexion;
 
-    public function __construct (string $servername, string $username, string $password, string $dbname) {
-        $this->servername = $servername;
-        $this->username = $username;
-        $this->password = $password;
-        $this->dbname = $dbname;
-        $this->conexion = null;
+    // Configuración para Pinggy TCP
+    private $host = 'yklcs-2800-a4-1f46-a00-c9e5-3e7a-fe7a-48d7.run.pinggy-free.link';      //Remplazar con el nuevo host de pinggy cada vez que se reinicie
+    private $port = 38663;        //Remplazar con el nuevo puerto de pinggy cada vez que se reinicie 
+    private $db   = 'PeartoS.A'; 
+    private $user = 'PeartoS.A';
+    private $pass = 'pearto81';       
+    private $charset = 'utf8mb4';
+
+    private function __construct() {
+        $dsn = "mysql:host={$this->host};port={$this->port};dbname={$this->db};charset={$this->charset}";
+        $opciones = [
+            PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+            PDO::ATTR_EMULATE_PREPARES   => false,
+        ];
+        try {
+            $this->conexion = new PDO($dsn, $this->user, $this->pass, $opciones);
+        } catch (PDOException $e) {
+            die("Error de conexión a la base de datos: " . $e->getMessage());
+        }
     }
 
-    public function establecerConexion(): PDO {
-        try {
-            $this->conexion = new PDO("mysql:host=$this->servername;dbname=$this->dbname", $this->username, $this->password);
-            // set the PDO error mode to exception
-            $this->conexion->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        } catch (PDOException $e) {
-            echo "Error al conectar..." . $e->getMessage();
+    public static function getInstancia() {
+        if (self::$instancia === null) {
+            self::$instancia = new ConectorPDO();
         }
+        return self::$instancia;
+    }
+
+    public function getConexion() {
         return $this->conexion;
     }
-
-    public function desconectar() {
-        $this->conexion = null;
-    }
-};
-
-//Código para depuración
-//$ConectorPDO = new ConectorPDO ("localhost:3306", "leandro", "123", "test");
-//$ConectorPDO->establecerConexion();
-
-?>
+}

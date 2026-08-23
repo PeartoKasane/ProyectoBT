@@ -1,108 +1,75 @@
 <?php
+require_once __DIR__ . '/ConectorPDO.php';
+require_once __DIR__ . '/Usuario.php';
 
-/**
- * Clase que simula una recuperación de credenciales correspondientes a la base de datos.
- */
 class AccesoDatosUsuario {
-    private PDO $conexion;
+    private $pdo;
 
-    /**
-     * Constructor parametrizado que recibe una conexión a la base de datos.
-     * @param PDO $conexion La conexion a la base de datos. PRECONDICION: No debe ser NULL.
-     */
-    public function __construct (PDO $conexion) {
-        $this->conexion = $conexion;
+    public function __construct($conexion = null) {
+        $this->pdo = $conexion ?? ConectorPDO::getInstancia()->getConexion();
     }
 
-    /**
-     * Busca un usuario por su cédula y determina el rol.
-     * @param string $cedula La cedula del usuario sin puntos ni guiones.
-     * @return Usuario|null Los datos del usuario, retorna su objeto si existe, null en caso contrario.
-     */
-    public function buscarUsuario(string $cedula): ?Usuario
-    {
-        $sql = "
-            SELECT
-                u.cedula,
-                u.claveHash,
-                u.sesionActiva,
+    // DQL - Obtener usuario para Login y verificación de clave
+    public function obtenerPorDocumento($documento) {
+        $sql = "SELECT documento, nombre, apellido, email, clave, rol FROM usuarios WHERE documento = :doc LIMIT 1";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([':doc' => $documento]);
+        $row = $stmt->fetch();
 
-                CASE
-                    WHEN a.cedula IS NOT NULL THEN TRUE
-                    ELSE FALSE
-                END AS administrador,
-
-                CASE
-                    WHEN l.cedula IS NOT NULL THEN TRUE
-                    ELSE FALSE
-                END AS logistica
-
-            FROM USUARIO AS u
-
-            LEFT JOIN ADMINISTRADOR AS a
-                ON a.cedula = u.cedula
-
-            LEFT JOIN LOGISTICA AS l
-                ON l.cedula = u.cedula
-
-            WHERE u.cedula = :cedula
-        ";
-
-        $consulta = $this->conexion->prepare($sql);
-
-        $consulta->execute(["cedula" => $cedula]);
-
-        $usuario = $consulta->fetch(PDO::FETCH_ASSOC);
-
-        //Una vez usada la consulta, desconectar el objeto PDOStatement. https://www.php.net/manual/en/pdo.connections.php
-        $consulta = null;
-
-        if ($usuario === false) {
-            return null;
+        if ($row) {
+            return new Usuario(
+                $row['documento'],
+                $row['nombre'],
+                $row['apellido'],
+                $row['email'],
+                $row['clave'],
+                $row['rol']
+            );
         }
-
-        return new Usuario(
-            $usuario["cedula"],
-            $usuario["claveHash"],
-            (bool) $usuario["sesionActiva"],
-            (bool) $usuario["administrador"],
-            (bool) $usuario["logistica"]
-        );
+        return null;
     }
 
-    public function listarUsuarios (): array {
-        $sql = "
-            SELECT
-                u.cedula,
-                u.nombre,
-                u.apellido,
+    // DQL - Listar todos los usuarios para el Administrador (Sin logística)
+    public function listarUsuarios() {
+        $sql = "SELECT documento AS cedula, nombre, apellido, rol, 
+                       (CASE WHEN rol = 'Administrador' THEN 1 ELSE 0 END) AS administrador
+                FROM usuarios";
+        $stmt = $this->pdo->query($sql);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 
-                CASE
-                    WHEN a.cedula IS NOT NULL THEN TRUE
-                    ELSE FALSE
-                END AS administrador,
+    // DQL - Listar usuarios por rol específico (Para paneles de Docente / Dirección)
+    public function listarPorRol($rol) {
+        $sql = "SELECT documento AS cedula, nombre, apellido, email, rol 
+                FROM usuarios 
+                WHERE rol = :rol";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([':rol' => $rol]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 
-                CASE
-                    WHEN l.cedula IS NOT NULL THEN TRUE
-                    ELSE FALSE
-                END AS logistica
+    // DML - Guardar / Alta de empleado (Crea el hash criptográfico antes de almacenar)
+    public function guardarEmpleado($cedula, $nombre, $apellido, $rol, $clavePlana) {
+        // Generación de hash seguro con BCRYPT (sal aleatoria interna + hash binario/string)
+        $claveHash = password_hash($clavePlana, PASSWORD_BCRYPT);
 
-            FROM USUARIO AS u
+        $sql = "INSERT INTO usuarios (documento, nombre, apellido, rol, clave) 
+                VALUES (:doc, :nom, :ape, :rol, :clave)
+                ON DUPLICATE KEY UPDATE nombre = :nom, apellido = :ape, rol = :rol";
+        $stmt = $this->pdo->prepare($sql);
+        return $stmt->execute([
+            ':doc' => $cedula,
+            ':nom' => $nombre,
+            ':ape' => $apellido,
+            ':rol' => $rol,
+            ':clave' => $claveHash
+        ]);
+    }
 
-            LEFT JOIN ADMINISTRADOR AS a
-                ON a.cedula = u.cedula
-
-            LEFT JOIN LOGISTICA AS l
-                ON l.cedula = u.cedula";
-
-        $consulta = $this->conexion->query($sql);
-
-        $usuarios = $consulta->fetchAll(PDO::FETCH_ASSOC);
-
-        $consulta = null;
-
-        return $usuarios;
+    // DML - Eliminar empleado
+    public function eliminarEmpleado($cedula) {
+        $sql = "DELETE FROM usuarios WHERE documento = :doc";
+        $stmt = $this->pdo->prepare($sql);
+        return $stmt->execute([':doc' => $cedula]);
     }
 }
-
-?>

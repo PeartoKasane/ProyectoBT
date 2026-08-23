@@ -1,33 +1,22 @@
 <?php
-
-require_once __DIR__ . "/../modelo/AccesoDatosUsuario.php";
+require_once __DIR__ . '/AccesoDatosUsuario.php';
 
 class Login {
-    private AccesoDatosUsuario $accesoDatosUsuario;
+    private $accesoDatos;
 
-    //Constructor parametrizado
-    public function __construct(AccesoDatosUsuario $accesoDatosUsuario) {
-        $this->accesoDatosUsuario = $accesoDatosUsuario;
+    public function __construct() {
+        $this->accesoDatos = new AccesoDatosUsuario();
     }
 
-    public function autenticar(string $cedula, string $clave): ?Usuario {
-        $usuario = $this->accesoDatosUsuario->buscarUsuario($cedula);
+    public function autenticar($cedula, $clave) {
+        $usuario = $this->accesoDatos->obtenerPorDocumento($cedula);
 
-        if ($usuario === null) {
-            return null;
+        if ($usuario) {
+            // Verifica la contraseña ingresada contra el hash BCRYPT almacenado en la BD
+            if (password_verify($clave, $usuario->getClave())) {
+                return $usuario;
+            }
         }
-
-        if ($usuario->tieneSesionActiva()) {
-            return null;
-            
-        }
-
-        if ( !password_verify($clave, $usuario->getClaveHash() ) ){
-            return null;
-        }
-
-        return $usuario;
+        return null;
     }
 }
-
-?>
