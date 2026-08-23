@@ -1,0 +1,274 @@
+<!--
+  este archivo es la vista de administración.
+  no lo toco mucho porque si rompo algo se rompe todo.
+  pero basicamente hace falta para mostrar la pantalla.
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="assets/css/global.css">
+</head>
+<body class="bg-light d-flex flex-column min-vh-100 justify-content-between">
+
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
+        <!-- Contenedor ancho que agrupa la navbar: controla el padding horizontal -->
+        <div class="container-fluid px-4">
+            <a class="navbar-brand fw-bold" href="#">Panel de Administración</a>
+            <!-- Zona de la derecha en la navbar: botones y espacio para el menú del usuario -->
+            <div class="navbar-nav ms-auto d-flex align-items-center gap-2">
+                <!-- Placeholder donde el JS inyecta el selector/menú del usuario -->
+                <div id="selectorVentanaUsuario" class="d-flex gap-2"></div>
+                <a class="btn btn-outline-danger btn-sm fw-bold" href="index.html" onclick="localStorage.removeItem('sesionUsuario'); location.replace('index.html'); return false;">Cerrar Sesión</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container my-4 flex-grow-1">
+        
+        <header class="row mb-4">
+            <!-- Encabezado centrado: título y aviso informativo -->
+            <div class="col-12 text-center">
+                <h1 class="display-6 fw-bold text-dark bg-secondary text-white py-3 rounded shadow-sm">Panel de Administración</h1>
+                <!-- Aviso informativo: se usa para explicar reglas o mostrar mensajes importantes -->
+                <div class="alert alert-info mt-3 shadow-sm" role="alert">
+                    La prioridad de los tickets va de <strong>0 a 2</strong>, donde 0 es la más alta y 2 es la más baja.
+                </div>
+            </div>
+        </header>
+
+        <section class="row mb-4" aria-label="Listado de Tickets">
+            <div class="col-12">
+                <!-- Contenedor de tabla: hace la tabla scrollable en móvil y le da fondo/padding -->
+                <div class="tablaContenedor table-responsive shadow-sm rounded bg-white p-3">
+                    <table class="table table-striped table-hover align-middle m-0">
+                        <thead class="table-dark text-center">
+                            <tr>
+                                <th scope="col">Salón</th>
+                                <th scope="col">Ticket</th>
+                                <th scope="col" class="col-prioridad">Prioridad</th>
+                                <th scope="col">Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody id="registro_tickets" class="text-center">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <section class="row justify-content-center mb-4" aria-label="Acciones de administración">
+            <!-- Botón centrado en su columna: accion rápida para abrir modal -->
+            <div class="col-auto text-center">
+                <button type="button" class="botonCambiarEstado btn btn-dark fw-semibold shadow-sm px-4 py-2" data-bs-toggle="modal" data-bs-target="#modal-cambiar-estado">
+                    Modificar estado de los tickets
+                </button>
+            </div>
+        </section>
+
+        <section class="row mb-4" aria-label="Gestión de usuarios">
+            <div class="col-12">
+                <!-- Tarjeta para gestión de usuarios: agrupa los 3 formularios y les da un fondo y padding -->
+                <div class="card shadow-sm border-0 bg-white p-4">
+                    <h2 class="h4 fw-bold text-dark mb-3">Gestión de usuarios</h2>
+                    <!-- Mensajes dinámicos sobre operaciones con usuarios (éxito/error) -->
+                    <div id="mensajeUsuario" class="alert alert-secondary d-none" role="alert"></div>
+
+                    <!-- Fila que organiza los 3 formularios en columnas responsive -->
+                    <div class="row g-3">
+                        <div class="col-12 col-lg-4">
+                            <form id="form-agregar-usuario" class="border rounded p-3 bg-light">
+                                <h3 class="h6 fw-bold text-dark mb-3">Agregar usuario</h3>
+                                <!-- Campo Cédula: cada input está en su propia caja para separar errores/labels -->
+                                <div class="mb-3">
+                                    <label for="cedulaUsuario" class="form-label fw-semibold text-secondary">Cédula:</label>
+                                    <input type="text" id="cedulaUsuario" class="form-control" placeholder="Ej: 12345678" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="nombreUsuario" class="form-label fw-semibold text-secondary">Nombre:</label>
+                                    <input type="text" id="nombreUsuario" class="form-control" placeholder="Ej: Juan Pérez" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="rolUsuario" class="form-label fw-semibold text-secondary">Rol:</label>
+                                    <select id="rolUsuario" class="form-select" required>
+                                        <option value="">Seleccione un rol</option>
+                                        <option value="Administrador">Administrador</option>
+                                        <option value="Técnico">Técnico</option>
+                                        <option value="Docente">Docente</option>
+                                        <option value="Dirección">Dirección</option>
+                                    </select>
+                                </div>
+                                <button type="submit" class="btn btn-dark w-100">Agregar usuario</button>
+                            </form>
+                        </div>
+
+                        <div class="col-12 col-lg-4">
+                            <form id="form-eliminar-usuario" class="border rounded p-3 bg-light">
+                                <h3 class="h6 fw-bold text-dark mb-3">Eliminar usuario</h3>
+                                <!-- Mensaje dinámico para eliminación -->
+                                <div id="mensajeEliminarUsuario" class="alert alert-secondary d-none" role="alert"></div>
+                                <!-- Campo para cédula a eliminar -->
+                                <div class="mb-3">
+                                    <label for="cedulaEliminarUsuario" class="form-label fw-semibold text-secondary">Cédula:</label>
+                                    <input type="text" id="cedulaEliminarUsuario" class="form-control" placeholder="Ej: 12345678" required>
+                                </div>
+                                <button type="submit" class="btn btn-outline-danger w-100">Eliminar usuario</button>
+                            </form>
+                        </div>
+
+                        <div class="col-12 col-lg-4">
+                            <form id="form-cambiar-rol" class="border rounded p-3 bg-light">
+                                <h3 class="h6 fw-bold text-dark mb-3">Cambiar rol</h3>
+                                <!-- Mensaje dinámico para cambio de rol -->
+                                <div id="mensajeCambioRol" class="alert alert-secondary d-none" role="alert"></div>
+                                <!-- Campo y select para cambiar rol -->
+                                <div class="mb-3">
+                                    <label for="cedulaCambioRol" class="form-label fw-semibold text-secondary">Cédula:</label>
+                                    <input type="text" id="cedulaCambioRol" class="form-control" placeholder="Ej: 12345678" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="nuevoRolUsuario" class="form-label fw-semibold text-secondary">Nuevo rol:</label>
+                                    <select id="nuevoRolUsuario" class="form-select" required>
+                                        <option value="">Seleccione un rol</option>
+                                        <option value="Administrador">Administrador</option>
+                                        <option value="Técnico">Técnico</option>
+                                        <option value="Docente">Docente</option>
+                                        <option value="Dirección">Dirección</option>
+                                    </select>
+                                </div>
+                                <button type="submit" class="btn btn-warning text-dark w-100">Cambiar rol</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="modal fade modalTicket" id="modal-cambiar-estado" tabindex="-1" aria-labelledby="modal-cambiar-estado-label" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <form id="form-cambiar-estado">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="modal-cambiar-estado-label">Modificar estado del ticket</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label for="ticketSeleccionado" class="form-label">Ticket:</label>
+                                <select id="ticketSeleccionado" class="form-select" required>
+                                    <option value="">Selecciona un ticket</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Estado actual:</label>
+                                <div id="estadoActual" class="fw-semibold text-secondary">Sin ticket seleccionado</div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="nuevoEstado" class="form-label">Nuevo estado:</label>
+                                <select id="nuevoEstado" class="form-select" required>
+                                    <option value="Pendiente">Pendiente</option>
+                                    <option value="Evaluando">Evaluando</option>
+                                    <option value="En proceso">En proceso</option>
+                                    <option value="Terminado">Terminado</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-dark">Guardar cambios</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <section class="row mb-4" aria-label="Solicitudes de programas">
+            <div class="col-12">
+                <div class="tablaContenedor table-responsive shadow-sm rounded bg-white p-3">
+                    <h2 class="h4 fw-bold text-dark mb-3">Solicitudes de programas</h2>
+                    <table class="table table-striped table-hover align-middle m-0">
+                        <thead class="table-dark text-center">
+                            <tr>
+                                <th scope="col">Docente</th>
+                                <th scope="col">Laboratorio</th>
+                                <th scope="col">Programa</th>
+                                <th scope="col">Descripción</th>
+                                <th scope="col">Fecha</th>
+                                <th scope="col">Hora</th>
+                                <th scope="col">Estado</th>
+                                <th scope="col">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="registro_solicitudes" class="text-center">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <section class="row justify-content-center mb-4" aria-label="Visualización de datos">
+            <div class="col-12 col-md-8 text-center">
+                <figure class="card shadow-sm p-4 bg-white border-0 d-flex align-items-center justify-content-center m-0">
+                    <!-- Contenedor responsable del ancho de la figura (clase .admin-figure-wrap en global.css) -->
+                    <div class="admin-figure-wrap">
+                        <img src="assets/Imgs/Gráfico.png" alt="Gráfico de Incidencias" class="img-fluid rounded w-100 h-auto">
+                    </div>
+                    <figcaption class="visually-hidden">Gráfica de Incidencias del sistema</figcaption>
+                </figure>
+            </div>
+        </section>
+        
+    </main>
+
+    <footer class="w-100 bg-secondary text-white text-center py-3">
+       <p class="m-0 small">&copy; 2026 I.T.I</p>
+    </footer>
+
+   <!-- Modelo que representa los equipos -->
+<script src="assets/js/modelos/equipo.js"></script>
+
+<!-- Modelo que representa los tickets -->
+<script src="assets/js/modelos/ticket.js"></script>
+
+<!-- Modelo que representa las solicitudes de programas -->
+<script src="assets/js/modelos/solicitudPrograma.js"></script>
+
+<!-- Gestión del almacenamiento de tickets -->
+<script src="assets/js/storage/ticketStorage.js"></script>
+
+<!-- Gestión del almacenamiento de solicitudes -->
+<script src="assets/js/storage/solicitudProgramaStorage.js"></script>
+
+<!-- Lógica relacionada con los tickets -->
+<script src="assets/js/servicios/ticketServicio.js"></script>
+
+<!-- Lógica relacionada con las solicitudes de programas -->
+<script src="assets/js/servicios/solicitudProgramaServicio.js"></script>
+<script src="assets/js/servicios/permisosServicio.js"></script>
+
+<!-- Modelos y vistas relacionadas con usuarios -->
+<script src="assets/js/modelos/usuario.js"></script>
+<script src="assets/js/vistas/usuarioVista.js"></script>
+
+<!-- Vista de la página de administración -->
+<script src="assets/js/vistas/adminVista.js"></script>
+<script src="assets/js/vistas/solicitudProgramaVista.js"></script>
+
+<!-- Controlador de la página de administración -->
+<script src="assets/js/controladores/adminControlador.js"></script>
+<script src="assets/js/controladores/solicitudProgramaControlador.js"></script>
+<script src="assets/js/controladores/usuarioControlador.js"></script>
+
+<!-- JavaScript de Bootstrap -->
+<script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+    crossorigin="anonymous">
+</script>
+<!-- Comentario: script de Bootstrap incluido una sola vez -->
+</body>
+</html>
