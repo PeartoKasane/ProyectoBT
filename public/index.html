@@ -60,28 +60,26 @@
         document.addEventListener('DOMContentLoaded', async () => {
             const formulario = document.getElementById('form-login');
 
-            // esto crea los usuarios de prueba
-            let credencialesPreparadas = false;
+            // Si venimos del logout del servidor, limpiar localStorage
             try {
-                credencialesPreparadas = Boolean(await UsuarioStorage.inicializarUsuariosPrueba());
-            } catch (error) {
-                credencialesPreparadas = false;
-            }
-
-            if (!credencialesPreparadas) {
-                alert('No se pudieron preparar las credenciales.');
-                return;
+                const params = new URLSearchParams(window.location.search);
+                if (params.get('mensaje') === 'sesion_cerrada') {
+                    PermisoServicio.limpiarSesionUsuario();
+                    // pequeño aviso opcional
+                    // alert('Sesión cerrada.');
+                }
+            } catch (e) {
+                // ignorar
             }
 
             if (!formulario) {
                 return;
             }
 
-            // el submit del form
+            // el submit del form: envía al servidor para validar credenciales
             formulario.addEventListener('submit', async function (event) {
                 event.preventDefault();
 
-                // agarra lo que puso el usuario
                 const cedula = document.getElementById('ci').value.trim();
                 const contrasena = document.getElementById('contrasena').value.trim();
 
@@ -90,35 +88,79 @@
                     return;
                 }
 
-                // revisa si existe ese usuario con esa contraseña
-                let usuarioEncontrado;
+                const formData = new FormData();
+                formData.append('ci', cedula);
+                formData.append('contrasena', contrasena);
+
+                let resp;
                 try {
-                    usuarioEncontrado = await UsuarioStorage.buscarUsuarioPorCredenciales(cedula, contrasena);
+                    resp = await fetch('../app/controlador/procesarLogin.php', {
+                        method: 'POST',
+                        body: formData,
+                        headers: { 'Accept': 'application/json' }
+                    });
                 } catch (error) {
-                    alert('No se pudieron verificar las credenciales.');
+                    alert('No se pudo conectar con el servidor.');
                     return;
                 }
 
-                if (!usuarioEncontrado) {
-                    alert('Credenciales inválidas.');
+                // intentar parsear JSON
+                let json;
+                try {
+                    json = await resp.json();
+                } catch (error) {
+                    alert('Respuesta inválida del servidor.');
                     return;
                 }
 
-                // guarda solo la data que necesita para la sesion
+                if (!resp.ok || !json) {
+                    const err = (json && json.error) ? json.error : 'error_desconocido';
+                    alert('Error: ' + err);
+                    return;
+                }
+
+                if (!json.success) {
+                    alert('Error: ' + (json.error || 'credenciales_invalidas'));
+                    return;
+                }
+
+                const data = json.data || {};
                 const usuario = {
-                    cedula: usuarioEncontrado.cedula,
-                    nombre: usuarioEncontrado.nombre,
-                    roles: PermisoServicio.normalizarRoles(usuarioEncontrado.roles)
+                    cedula: data.documento || cedula,
+                    nombre: data.nombre || '',
+                    email: data.email || '',
+                    roles: Array.isArray(data.roles) ? data.roles : []
                 };
 
+                // Guardar solo copia en localStorage para la UI (no guardar contraseñas)
                 try {
-                    localStorage.setItem('sesionUsuario', JSON.stringify(usuario));
+                    PermisoServicio.guardarSesionUsuario(usuario);
                 } catch (error) {
-                    alert('No se pudo guardar la sesión.');
-                    return;
+                    // si falla guardar en localStorage no bloquear el login
+                    console.warn('No se pudo guardar sesión en localStorage', error);
                 }
 
-                // averiguamos a que pagina va segun el rol principal
+                const rolPrincipal = PermisoServicio.obtenerRolPrincipal(usuario.roles);
+                const destino = PermisoServicio.obtenerRutaVentana(rolPrincipal);
+                window.location.href = destino || 'index.html';
+            });
+        });
+    </script>
+                const usuario = {
+                    cedula: data.documento || cedula,
+                    nombre: data.nombre || '',
+                    email: data.email || '',
+                    roles: Array.isArray(data.roles) ? data.roles : []
+                };
+
+                // Guardar solo copia en localStorage para la UI (no guardar contraseñas)
+                try {
+                    PermisoServicio.guardarSesionUsuario(usuario);
+                } catch (error) {
+                    // si falla guardar en localStorage no bloquear el login
+                    console.warn('No se pudo guardar sesión en localStorage', error);
+                }
+
                 const rolPrincipal = PermisoServicio.obtenerRolPrincipal(usuario.roles);
                 const destino = PermisoServicio.obtenerRutaVentana(rolPrincipal);
                 window.location.href = destino || 'index.html';

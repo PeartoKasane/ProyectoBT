@@ -3,7 +3,7 @@ session_start();
 
 // Validar sesión y rol
 if (!isset($_SESSION['usuario_doc']) || strtolower($_SESSION['usuario_rol']) !== 'administrador') {
-    header("Location: ../../public/Login.html?error=acceso_denegado");
+    header("Location: ../../public/index.html?error=acceso_denegado");
     exit();
 }
 

@@ -21,6 +21,6 @@ if (ini_get("session.use_cookies")) {
 // Destruir la sesión
 session_destroy();
 
-// Redirigir al Login
-header("Location: Login.html?mensaje=sesion_cerrada");
+// Redirigir al Login (señalando al cliente que limpie localStorage)
+header("Location: ../../public/index.html?mensaje=sesion_cerrada");
 exit();
