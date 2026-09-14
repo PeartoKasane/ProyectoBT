@@ -24,13 +24,23 @@ function parseRolesFromString($raw) {
 $PRIORIDAD = ['Administrador', 'Dirección', 'Técnico', 'Docente'];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $cedula   = $_POST['ci'] ?? $_POST['documento'] ?? '';
-    $password = $_POST['contrasena'] ?? $_POST['clave'] ?? '';
+    // si viene cuerpo en JSON (fetch / AJAX)
+    $inputJSON = json_decode(file_get_contents('php://input'), true) ?? [];
+
+    // obtener cédula y contraseña desde $_POST o JSON limpiando espacios
+    $cedula   = trim($_POST['ci'] ?? $_POST['documento'] ?? $inputJSON['ci'] ?? $inputJSON['documento'] ?? '');
+    $password = trim($_POST['contrasena'] ?? $_POST['clave'] ?? $inputJSON['contrasena'] ?? $inputJSON['clave'] ?? '');
+
+    // detectar si la petición es AJAX/JSON o espera respuesta JSON
+    $accept      = $_SERVER['HTTP_ACCEPT'] ?? '';
+    $contentType = $_SERVER['CONTENT_TYPE'] ?? '';
+    $isJsonRequest = (strpos($accept, 'application/json') !== false) || 
+                     (strpos($contentType, 'application/json') !== false) || 
+                     !empty($inputJSON);
 
     if (empty($cedula) || empty($password)) {
         // si es AJAX/Fetch, responder JSON
-        $accept = $_SERVER['HTTP_ACCEPT'] ?? '';
-        if (strpos($accept, 'application/json') !== false) {
+        if ($isJsonRequest) {
             http_response_code(400);
             header('Content-Type: application/json');
             echo json_encode(['success' => false, 'error' => 'campos_vacios']);
@@ -74,8 +84,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $_SESSION['usuario_rol']    = $rolPrincipal;
 
         // si la petición espera JSON (cliente SPA), devolver datos básicos
-        $accept = $_SERVER['HTTP_ACCEPT'] ?? '';
-        if (strpos($accept, 'application/json') !== false) {
+        if ($isJsonRequest) {
             header('Content-Type: application/json');
             echo json_encode([
                 'success' => true,
@@ -107,8 +116,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         exit();
     } else {
-        $accept = $_SERVER['HTTP_ACCEPT'] ?? '';
-        if (strpos($accept, 'application/json') !== false) {
+        if ($isJsonRequest) {
             http_response_code(401);
             header('Content-Type: application/json');
             echo json_encode(['success' => false, 'error' => 'credenciales_invalidas']);

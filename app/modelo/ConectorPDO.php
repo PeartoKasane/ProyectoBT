@@ -4,8 +4,8 @@ class ConectorPDO {
     private $conexion;
 
     // Configuración para Pinggy TCP
-    private $host = 'npope-167-60-191-50.run.pinggy-free.link';      //Remplazar con el nuevo host de pinggy cada vez que se reinicie
-    private $port = 42931;        //Remplazar con el nuevo puerto de pinggy cada vez que se reinicie 
+    private $host = 'hilci-186-53-30-83.run.pinggy-free.link';      //Remplazar con el nuevo host de pinggy cada vez que se reinicie
+    private $port = 42659;        //Remplazar con el nuevo puerto de pinggy cada vez que se reinicie 
     private $db   = 'PeartoS.A'; 
     private $user = 'root';
     private $pass = '';       

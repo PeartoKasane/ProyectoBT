@@ -146,26 +146,5 @@
             });
         });
     </script>
-                const usuario = {
-                    cedula: data.documento || cedula,
-                    nombre: data.nombre || '',
-                    email: data.email || '',
-                    roles: Array.isArray(data.roles) ? data.roles : []
-                };
-
-                // Guardar solo copia en localStorage para la UI (no guardar contraseñas)
-                try {
-                    PermisoServicio.guardarSesionUsuario(usuario);
-                } catch (error) {
-                    // si falla guardar en localStorage no bloquear el login
-                    console.warn('No se pudo guardar sesión en localStorage', error);
-                }
-
-                const rolPrincipal = PermisoServicio.obtenerRolPrincipal(usuario.roles);
-                const destino = PermisoServicio.obtenerRutaVentana(rolPrincipal);
-                window.location.href = destino || 'index.html';
-            });
-        });
-    </script>
 </body>
 </html>
