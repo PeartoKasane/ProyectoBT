@@ -126,7 +126,7 @@ El sistema permitirá clasificar incidencias según su gravedad.
 ##### RF20: 
 El sistema permitirá actualizar el estado de los tickets.
 ##### RF21: 
-El sistema manejará estados como pendiente, en proceso y resuelto.
+El sistema manejará estados como pendiente, evaluando, en proceso y terminado (resuelto) para los tickets, y pendiente, en proceso y resuelta para las solicitudes.
 ##### RF22: 
 Solamente usuarios autorizados podrán modificar el estado de los tickets.
 ##### RF23: 

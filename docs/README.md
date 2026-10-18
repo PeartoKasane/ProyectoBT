@@ -31,6 +31,7 @@ La documentación del proyecto se encuentra organizada en la carpeta `docs`.
 
 Incluye:
 
-- `descripcion-proyecto.md`: descripción general, objetivos y tecnologías utilizadas.
 - `requerimientos.md`: requerimientos funcionales y no funcionales del sistema.
+- `decisiones.md`: decisiones técnicas tomadas durante el desarrollo.
+- `api.md`: endpoints de la API de usuarios y cómo probarla.
 - `git.md`: convenciones de commits, estrategia de ramas y gestión del repositorio.
