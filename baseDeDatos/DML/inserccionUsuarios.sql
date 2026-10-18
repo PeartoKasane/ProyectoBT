@@ -1,42 +1,32 @@
 /*
     Espacio donde se deberán colocar todas las insercciones utilizadas en la primer ejecución del programa para el testeo.
 */
---Registrar un nuevo laboratorio y equipo
-INSERT INTO laboratorio (nombre_laboratorio, ubicacion, activo)
-VALUES ('Lab Redes 1', 'Edificio A - Piso 2', TRUE);
 
-INSERT INTO equipo (id_equipo, tipo, estado, nombre_laboratorio)
-VALUES (101, 'Switch Cisco 2960', 'Operativo', 'Lab Redes 1');
+INSERT INTO USUARIO (cedula, nombre, apellido, email, claveHash) VALUES ('11111111', 'Admin', 'SGRSI', 'admin@pearto.com', '$2y$12$ki0bVkt8cnZuR4v6aJvhhelaeQc1/4fec2txUcuG1Ybr4cvnhg2sS');
+INSERT INTO USUARIO (cedula, nombre, apellido, email, claveHash) VALUES ('22222222', 'Carlos', 'Docente', 'carlos@pearto.com', '$2y$12$ki0bVkt8cnZuR4v6aJvhhelaeQc1/4fec2txUcuG1Ybr4cvnhg2sS');
+INSERT INTO USUARIO (cedula, nombre, apellido, email, claveHash) VALUES ('33333333', 'Ana', 'Director', 'ana@pearto.com', '$2y$12$ki0bVkt8cnZuR4v6aJvhhelaeQc1/4fec2txUcuG1Ybr4cvnhg2sS');
+INSERT INTO USUARIO (cedula, nombre, apellido, email, claveHash) VALUES ('44444444', 'Marcos', 'Tecnico', 'marcos@pearto.com', '$2y$12$ki0bVkt8cnZuR4v6aJvhhelaeQc1/4fec2txUcuG1Ybr4cvnhg2sS');
 
---Crear un ticket de incidencia sobre un equipo
-INSERT INTO ticket (id_incidencia, descripcion, fecha, estado, gravedad, prioridad, id_equipo)
-VALUES (5001, 'Fallo en puerto Gigabit 1/0/1', CURRENT_DATE, 'Pendiente', 'Alta', 'Alta', 101);
+INSERT INTO ADMINISTRADOR (cedula) VALUES ('11111111');
+INSERT INTO DOCENTE (cedula) VALUES ('22222222');
+INSERT INTO DIRECCION (cedula) VALUES ('33333333');
+INSERT INTO TECNICO (cedula) VALUES ('44444444');
 
---Actualizar el estado del equipo al reportar una falla
-UPDATE equipo
-SET estado = 'En Mantenimiento'
-WHERE id_equipo = 101;
+-- Usuarios de prueba adicionales para verificar las reglas del sistema (misma clave: "clave1234567")
+-- 55555555: segundo docente. 66666666: cuenta deshabilitada (RF36) y sin correo. 77777777: segundo administrador.
+INSERT INTO USUARIO (cedula, nombre, apellido, email, claveHash) VALUES ('55555555', 'Lucía', 'Docente', 'lucia@pearto.com', '$2y$12$ki0bVkt8cnZuR4v6aJvhhelaeQc1/4fec2txUcuG1Ybr4cvnhg2sS');
+INSERT INTO USUARIO (cedula, nombre, apellido, email, claveHash, activo) VALUES ('66666666', 'Pedro', 'Suspendido', NULL, '$2y$12$ki0bVkt8cnZuR4v6aJvhhelaeQc1/4fec2txUcuG1Ybr4cvnhg2sS', FALSE);
+INSERT INTO USUARIO (cedula, nombre, apellido, email, claveHash) VALUES ('77777777', 'Laura', 'Admin', 'laura@pearto.com', '$2y$12$ki0bVkt8cnZuR4v6aJvhhelaeQc1/4fec2txUcuG1Ybr4cvnhg2sS');
 
---Marcar ticket como resuelto asignando el técnico que lo atiende
-UPDATE ticket
-SET estado = 'Resuelto', doc_tecnico = '12345678'
-WHERE id_incidencia = 5001;
-
---Cancelar una solicitud de preparación de laboratorio
-DELETE FROM solicitud_preparacion
-WHERE id_solicitud = 302 AND estado = 'Cancelada';
-
+INSERT INTO DOCENTE (cedula) VALUES ('55555555');
+INSERT INTO DOCENTE (cedula) VALUES ('66666666');
+INSERT INTO ADMINISTRADOR (cedula) VALUES ('77777777');
 
 /*
-INSERT INTO USUARIO (cedula, nombre, apellido, claveHash) VALUES ('11111111', 'Leandro', 'López', '$2y$12$ki0bVkt8cnZuR4v6aJvhhelaeQc1/4fec2txUcuG1Ybr4cvnhg2sS');
-
-INSERT INTO USUARIO (cedula, nombre, apellido, claveHash) VALUES ('22222222', 'Pepito', 'Alcachofas', '$2y$12$ki0bVkt8cnZuR4v6aJvhhelaeQc1/4fec2txUcuG1Ybr4cvnhg2sS');
-
-
     "clave1234567" ~ "$2y$12$ki0bVkt8cnZuR4v6aJvhhelaeQc1/4fec2txUcuG1Ybr4cvnhg2sS"
 
-    El hash se recuperó con el siguiente script para crear el primer usuario en el sistema
-    Nota: En el futuro se deberían cargar por un usuario administrador
+    El hash se recuperó con el siguiente script para crear los primeros usuarios en el sistema
+    Nota: en el futuro se deberían cargar por un usuario administrador desde procesarAltaUsuario.php
 
     <?php
         $return = password_hash('clave1234567', PASSWORD_DEFAULT);

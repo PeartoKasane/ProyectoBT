@@ -5,51 +5,16 @@
     que variará.
 */
 
---Listar equipos de un laboratorio específico con su estado
-SELECT e.id_equipo, e.marca, e.modelo, e.nro_serie, e.estado_hardware, l.nombre AS laboratorio
-FROM equipos e
-INNER JOIN laboratorios l ON e.id_laboratorio_actual = l.id_laboratorio
-WHERE l.id_laboratorio = 1;
-
---Actualizar ubicación de un equipo a otro laboratorio
-UPDATE equipos 
-SET id_laboratorio_actual = 2 
-WHERE id_equipo = 10;
-
---Crear una nueva reserva de laboratorio
-INSERT INTO reservas (id_docente, id_laboratorio, fecha_hora_inicio, fecha_hora_fin, observaciones, estado_reserva)
-VALUES (12345678, 1, '2026-08-20 08:00:00', '2026-08-20 10:00:00', 'Clase de Programación I', 'confirmada');
-
---Verificar la disponibilidad de un laboratorio en una fecha y hora
-SELECT id_reserva, estado_reserva 
-FROM reservas
-WHERE id_laboratorio = 1
-  AND estado_reserva IN ('confirmada', 'en_curso')
-  AND ('2026-08-20 08:30:00' < fecha_hora_fin AND '2026-08-20 09:30:00' > fecha_hora_inicio);
-
-  --Crear un ticket por falla en un equipo
-  INSERT INTO Ticket (id_usuario_reporta, id_equipo_afectado, id_laboratorio_afectado, titulo, descripcion, gravedad, estado)
-VALUES (12345678, 5, 1, 'Monitor no enciende', 'El equipo no da señal de video al presionar encendido.', 'media', 'enviado');
-
---Asignar técnico a un ticket y cambiar estado a 'en_proceso'
-UPDATE Ticket 
-SET id_tecnico_asignado = 87654321, estado = 'en_proceso'
-WHERE id_ticket = 3;
-
---Laboratorios con mayor cantidad de incidencias registradas
-SELECT l.nombre AS laboratorio, COUNT(t.id_ticket) AS total_tickets
-FROM laboratorios l
-LEFT JOIN Ticket t ON l.id_laboratorio = t.id_laboratorio_afectado
-GROUP BY l.id_laboratorio, l.nombre
-ORDER BY total_tickets DESC;
-
-
-
-/* Selecciona un usuario en base a su cédula, en PHP, donde aparece '00000000' debe ser remplazado por :cedula
+/* Selecciona un usuario en base a su cédula, en PHP, donde aparece '00000000' debe ser remplazado por :cedula */
 SELECT
     u.cedula,
+    u.nombre,
+    u.apellido,
+    u.email,
     u.claveHash,
+    u.activo,
     u.sesionActiva,
+    u.inicioSesion,
 
     CASE
         WHEN a.cedula IS NOT NULL THEN 1
@@ -57,17 +22,33 @@ SELECT
     END AS administrador,
 
     CASE
-        WHEN l.cedula IS NOT NULL THEN 1
+        WHEN d.cedula IS NOT NULL THEN 1
         ELSE 0
-    END AS logistica
+    END AS docente,
+
+    CASE
+        WHEN dir.cedula IS NOT NULL THEN 1
+        ELSE 0
+    END AS direccion,
+
+    CASE
+        WHEN t.cedula IS NOT NULL THEN 1
+        ELSE 0
+    END AS tecnico
 
 FROM USUARIO AS u
 
     LEFT JOIN ADMINISTRADOR AS a
     ON a.cedula = u.cedula
 
-    LEFT JOIN LOGISTICA AS l
-    ON l.cedula = u.cedula
+    LEFT JOIN DOCENTE AS d
+    ON d.cedula = u.cedula
+
+    LEFT JOIN DIRECCION AS dir
+    ON dir.cedula = u.cedula
+
+    LEFT JOIN TECNICO AS t
+    ON t.cedula = u.cedula
 
 WHERE u.cedula = '00000000';
 
@@ -76,6 +57,8 @@ SELECT
     u.cedula,
     u.nombre,
     u.apellido,
+    u.email,
+    u.activo,
 
     CASE
         WHEN a.cedula IS NOT NULL THEN 1
@@ -83,14 +66,72 @@ SELECT
     END AS administrador,
 
     CASE
-        WHEN l.cedula IS NOT NULL THEN 1
+        WHEN d.cedula IS NOT NULL THEN 1
         ELSE 0
-    END AS logistica
+    END AS docente,
+
+    CASE
+        WHEN dir.cedula IS NOT NULL THEN 1
+        ELSE 0
+    END AS direccion,
+
+    CASE
+        WHEN t.cedula IS NOT NULL THEN 1
+        ELSE 0
+    END AS tecnico
 
 FROM USUARIO AS u
 
 LEFT JOIN ADMINISTRADOR AS a
     ON a.cedula = u.cedula
 
-LEFT JOIN LOGISTICA AS l
-    ON l.cedula = u.cedula
+LEFT JOIN DOCENTE AS d
+    ON d.cedula = u.cedula
+
+LEFT JOIN DIRECCION AS dir
+    ON dir.cedula = u.cedula
+
+LEFT JOIN TECNICO AS t
+    ON t.cedula = u.cedula;
+
+/* Selecciona los datos públicos de un usuario con su rol como texto, dirigido a la API. Si tuviera más de un rol se prioriza Administrador, Docente, Dirección, Técnico.
+   En PHP, donde aparece '00000000' debe ser remplazado por :cedula. Para listar a todos los usuarios se quita la cláusula WHERE */
+SELECT
+    u.cedula,
+    u.nombre,
+    u.apellido,
+    u.email,
+    u.activo,
+
+    CASE
+        WHEN a.cedula IS NOT NULL THEN 'Administrador'
+        WHEN d.cedula IS NOT NULL THEN 'Docente'
+        WHEN dir.cedula IS NOT NULL THEN 'Dirección'
+        WHEN t.cedula IS NOT NULL THEN 'Técnico'
+        ELSE ''
+    END AS rol
+
+FROM USUARIO AS u
+
+LEFT JOIN ADMINISTRADOR AS a
+    ON a.cedula = u.cedula
+
+LEFT JOIN DOCENTE AS d
+    ON d.cedula = u.cedula
+
+LEFT JOIN DIRECCION AS dir
+    ON dir.cedula = u.cedula
+
+LEFT JOIN TECNICO AS t
+    ON t.cedula = u.cedula
+
+WHERE u.cedula = '00000000';
+
+/* RF36: habilita (1) o deshabilita (0) una cuenta. En PHP, '1' debe ser remplazado por :activo y '00000000' por :cedula */
+UPDATE USUARIO SET activo = 1 WHERE cedula = '00000000';
+
+/* RF37: registra que el usuario inició sesión (sesionActiva = 1 y el momento actual). En PHP, '00000000' debe ser remplazado por :cedula */
+UPDATE USUARIO SET sesionActiva = 1, inicioSesion = NOW() WHERE cedula = '00000000';
+
+/* RF37: registra que el usuario cerró sesión (sesionActiva = 0 y se limpia el momento de inicio). En PHP, '00000000' debe ser remplazado por :cedula */
+UPDATE USUARIO SET sesionActiva = 0, inicioSesion = NULL WHERE cedula = '00000000';

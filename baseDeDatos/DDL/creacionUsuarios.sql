@@ -2,94 +2,23 @@
     Espacio donde se deberán colocar todas las sentencias utilizadas para crear las tablas.
 */
 
-
- --tabla de usuarios
-CREATE TABLE usuarios (
-    documento INT AUTO_INCREMENT PRIMARY KEY,
-    nombre VARCHAR(50) NOT NULL,
-    apellido VARCHAR(50) NOT NULL,
-    email VARCHAR(100) NOT NULL UNIQUE,
-     claveHash VARCHAR(255) NOT NULL,
-    password VARCHAR(255) NOT NULL,
-    rol ENUM('administrador','docente','direccion') NOT NULL,
-    fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    UNIQUE (email)
-    unique (documento)
-) ENGINE=InnoDB;
-
---Tabla de Laboratorios
-CREATE TABLE laboratorios (
-    id_laboratorio INT AUTO_INCREMENT PRIMARY KEY,
-    nombre VARCHAR(50) NOT NULL, -- Ej: Lab A, Salón 105
-    ubicacion VARCHAR(100),
-    estado_salon ENUM('activo', 'mantenimiento', 'inactivo') DEFAULT 'activo'
-) ENGINE=InnoDB;
-
---Tabla de Equipos
-CREATE TABLE equipos (
-    id_equipo INT AUTO_INCREMENT PRIMARY KEY,
-    marca VARCHAR(50),
-    modelo VARCHAR(50),
-    nro_serie VARCHAR(100) UNIQUE,
-    estado_hardware ENUM('funcional', 'en_reparacion','critico') DEFAULT 'funcional',
-    id_laboratorio_actual INT,
-    FOREIGN KEY (id_laboratorio_actual) REFERENCES laboratorios(id_laboratorio) ON DELETE SET NULL
-) ENGINE=InnoDB;
-
---Tabla de Préstamos
-CREATE TABLE reservas (
-    id_reserva INT AUTO_INCREMENT PRIMARY KEY,
-    id_docente INT NOT NULL,
-    id_laboratorio INT NOT NULL,
-    fecha_hora_inicio DATETIME NOT NULL,
-    fecha_hora_fin DATETIME NOT NULL,
-    observaciones TEXT,
-    estado_reserva ENUM('confirmada', 'en_curso', 'finalizada', 'cancelada') DEFAULT 'confirmada',
-    FOREIGN KEY (id_docente) REFERENCES usuarios(documento),
-    FOREIGN KEY (id_laboratorio) REFERENCES laboratorios(id_laboratorio)
-) ENGINE=InnoDB;
-
---registro de quién utilizó cada máquina
-CREATE TABLE registro_uso_equipos (
-    id_reserva INT NOT NULL,
-    id_equipo INT NOT NULL,
-    PRIMARY KEY (id_reserva, id_equipo),
-    FOREIGN KEY (id_reserva) REFERENCES reservas(id_reserva) ON DELETE CASCADE,
-    FOREIGN KEY (id_equipo) REFERENCES equipos(id_equipo) ON DELETE CASCADE
-) ENGINE=InnoDB;
-
---Tabla de Tickets
-CREATE TABLE Ticket (
-    id_ticket INT AUTO_INCREMENT PRIMARY KEY,
-    id_usuario_reporta INT NOT NULL,
-    id_tecnico_asignado INT, 
-    id_equipo_afectado INT, 
-    id_laboratorio_afectado INT, 
-    titulo VARCHAR(100) NOT NULL,
-    descripcion TEXT NOT NULL,
-    fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    fecha_resolucion DATETIME,
-    -- Estados del ticket
-    estado ENUM('enviado', 'leido', 'sin_asignar', 'en_proceso', 'resuelto') DEFAULT 'enviado',
-    gravedad ENUM('baja', 'media', 'alta', 'critica') DEFAULT 'media',
-    FOREIGN KEY (id_usuario_reporta) REFERENCES usuarios(documento) ON DELETE SET NULL,
-    FOREIGN KEY (id_tecnico_asignado) REFERENCES usuarios(documento) ON DELETE SET NULL,
-    FOREIGN KEY (id_equipo_afectado) REFERENCES equipos(id_equipo) ON DELETE SET NULL,
-    FOREIGN KEY (id_laboratorio_afectado) REFERENCES laboratorios(id_laboratorio) ON DELETE SET NULL
-) ENGINE=InnoDB;
-
-/*
 CREATE TABLE USUARIO (
     cedula CHAR(8) NOT NULL,
     nombre VARCHAR(50) NOT NULL,
     apellido VARCHAR(50) NOT NULL,
+    email VARCHAR(100) DEFAULT NULL,
     claveHash VARCHAR(255) NOT NULL,
+    -- RF36: permite deshabilitar una cuenta sin eliminarla (por ejemplo, una licencia larga)
+    activo BOOLEAN NOT NULL DEFAULT TRUE,
     sesionActiva BOOLEAN NOT NULL DEFAULT FALSE,
+    -- Momento en que se inició la sesión activa; sirve para vencerla sola si nadie cerró sesión explícitamente
+    inicioSesion DATETIME DEFAULT NULL,
 
     CONSTRAINT pk_usuario
         PRIMARY KEY (cedula)
 );
 
+-- Igual que ADMINISTRADOR/LOGISTICA en sistema-elvis-tek: una tabla por rol, vinculada 1 a 1 con USUARIO
 CREATE TABLE ADMINISTRADOR (
     cedula CHAR(8) NOT NULL,
 
@@ -97,19 +26,26 @@ CREATE TABLE ADMINISTRADOR (
         PRIMARY KEY (cedula)
 );
 
-CREATE TABLE LOGISTICA (
+CREATE TABLE DOCENTE (
     cedula CHAR(8) NOT NULL,
 
-    CONSTRAINT pk_logistica
+    CONSTRAINT pk_docente
         PRIMARY KEY (cedula)
 );
 
-CREATE TABLE CARGO (
+CREATE TABLE DIRECCION (
     cedula CHAR(8) NOT NULL,
-    cargo VARCHAR(50) NOT NULL,
 
-    CONSTRAINT pk_cargo
-        PRIMARY KEY (cedula, cargo)
+    CONSTRAINT pk_direccion
+        PRIMARY KEY (cedula)
+);
+
+-- El técnico gestiona tickets y solicitudes, pero no usuarios (a diferencia del administrador)
+CREATE TABLE TECNICO (
+    cedula CHAR(8) NOT NULL,
+
+    CONSTRAINT pk_tecnico
+        PRIMARY KEY (cedula)
 );
 
 
@@ -118,12 +54,17 @@ ALTER TABLE ADMINISTRADOR
     FOREIGN KEY (cedula)
     REFERENCES USUARIO (cedula);
 
-ALTER TABLE LOGISTICA
-    ADD CONSTRAINT fk_logistica_usuario
+ALTER TABLE DOCENTE
+    ADD CONSTRAINT fk_docente_usuario
     FOREIGN KEY (cedula)
     REFERENCES USUARIO (cedula);
 
-ALTER TABLE CARGO
-    ADD CONSTRAINT fk_cargo_logistica
+ALTER TABLE DIRECCION
+    ADD CONSTRAINT fk_direccion_usuario
     FOREIGN KEY (cedula)
-    REFERENCES LOGISTICA (cedula);
+    REFERENCES USUARIO (cedula);
+
+ALTER TABLE TECNICO
+    ADD CONSTRAINT fk_tecnico_usuario
+    FOREIGN KEY (cedula)
+    REFERENCES USUARIO (cedula);
