@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reportes - SGRSI</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="../assets/css/global.css">
+</head>
+<body class="bg-light d-flex flex-column min-vh-100 justify-content-between">
+
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
+        <div class="container-fluid px-4">
+            <a class="navbar-brand fw-bold" href="#">SGRSI - Reportes</a>
+            <div class="navbar-nav ms-auto d-flex flex-row gap-2">
+                <a class="btn btn-outline-light btn-sm fw-bold" href="./administrador.html" data-roles="administrador">Inicio</a>
+                <a class="btn btn-outline-light btn-sm fw-bold" href="./direccion.html" data-roles="direccion">Inicio</a>
+                <a class="btn btn-outline-light btn-sm fw-bold" href="./docente.html" data-roles="docente">Inicio</a>
+                <a class="btn btn-outline-light btn-sm fw-bold" href="./tecnico.html" data-roles="tecnico">Inicio</a>
+                <a class="btn btn-outline-light btn-sm fw-bold" href="./inventario.html">Inventario</a>
+                <a class="btn btn-outline-light btn-sm fw-bold" href="./tickets.html">Tickets</a>
+                <a class="btn btn-outline-light btn-sm fw-bold" href="./solicitudes.html">Solicitudes</a>
+                <a class="btn btn-outline-light btn-sm fw-bold" href="./prestamos.html" data-roles="administrador direccion tecnico">Préstamos</a>
+                <a class="btn btn-light btn-sm fw-bold" href="./reportes.html" data-roles="administrador direccion tecnico">Reportes</a>
+                <a class="btn btn-outline-light btn-sm fw-bold" href="./actividad.html" data-roles="administrador">Actividad</a>
+                <button type="button" id="btnCerrarSesion" class="btn btn-outline-danger btn-sm fw-bold">Cerrar sesión</button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container my-4 flex-grow-1">
+
+        <header class="row mb-4">
+            <div class="col-12 text-center">
+                <h1 class="display-6 fw-bold text-dark bg-secondary text-white py-3 rounded shadow-sm">Reportes y estadísticas</h1>
+            </div>
+        </header>
+
+        <!-- Los resultados y errores los completa el script de la página con lo que responde la API -->
+        <div id="mensajeAlerta" class="alert d-none" role="alert"></div>
+
+        <!-- RF42: resumen general (los valores los completa reportes.js) -->
+        <section class="row mb-4 g-3">
+            <div class="col-6 col-md-3">
+                <div class="card shadow-sm border-0 bg-white p-3 text-center h-100">
+                    <div class="display-6 fw-bold text-dark" id="resUsuariosActivos">0</div>
+                    <div class="text-secondary small">Usuarios activos</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="card shadow-sm border-0 bg-white p-3 text-center h-100">
+                    <div class="display-6 fw-bold text-dark" id="resTotalEquipos">0</div>
+                    <div class="text-secondary small">Equipos en inventario</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-2">
+                <div class="card shadow-sm border-0 bg-white p-3 text-center h-100">
+                    <div class="display-6 fw-bold text-warning" id="resTicketsPendientes">0</div>
+                    <div class="text-secondary small">Tickets sin terminar</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-2">
+                <div class="card shadow-sm border-0 bg-white p-3 text-center h-100">
+                    <div class="display-6 fw-bold text-warning" id="resSolicitudesPendientes">0</div>
+                    <div class="text-secondary small">Solicitudes sin resolver</div>
+                </div>
+            </div>
+            <div class="col-12 col-md-2">
+                <div class="card shadow-sm border-0 bg-white p-3 text-center h-100">
+                    <div class="display-6 fw-bold text-info" id="resPrestamosActivos">0</div>
+                    <div class="text-secondary small">Préstamos activos</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- RF43: filtro de fechas, aplica al resto de los reportes -->
+        <section class="row mb-4">
+            <div class="col-12">
+                <div class="card shadow-sm border-0 bg-white p-3">
+                    <form id="formFiltro" class="row g-2 align-items-end">
+                        <div class="col-auto">
+                            <label for="desde" class="form-label fw-semibold text-secondary mb-1">Desde:</label>
+                            <input type="date" name="desde" id="desde" class="form-control">
+                        </div>
+                        <div class="col-auto">
+                            <label for="hasta" class="form-label fw-semibold text-secondary mb-1">Hasta:</label>
+                            <input type="date" name="hasta" id="hasta" class="form-control">
+                        </div>
+                        <div class="col-auto">
+                            <button type="submit" class="btn btn-dark fw-semibold">Filtrar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <!-- RF39: reportes de incidencias -->
+        <section class="row mb-4 g-3">
+            <div class="col-12 col-md-6">
+                <div class="card shadow-sm border-0 bg-white p-4 h-100">
+                    <h2 class="h5 fw-bold text-secondary mb-3">Tickets por estado</h2>
+                    <div id="graficoEstados"></div>
+                </div>
+            </div>
+            <div class="col-12 col-md-6">
+                <div class="card shadow-sm border-0 bg-white p-4 h-100">
+                    <h2 class="h5 fw-bold text-secondary mb-3">Tickets por prioridad</h2>
+                    <div id="graficoPrioridades"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- RF40: uso de equipos y recursos -->
+        <section class="row mb-4 g-3">
+            <div class="col-12 col-md-6">
+                <div class="card shadow-sm border-0 bg-white p-4 h-100">
+                    <h2 class="h5 fw-bold text-secondary mb-3">Equipos con más incidencias</h2>
+                    <div id="graficoIncidencias"></div>
+                </div>
+            </div>
+            <div class="col-12 col-md-6">
+                <div class="card shadow-sm border-0 bg-white p-4 h-100">
+                    <h2 class="h5 fw-bold text-secondary mb-3">Salas más utilizadas</h2>
+                    <div id="graficoSalas"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- RF41: préstamos y devoluciones -->
+        <section class="row mb-4 g-3">
+            <div class="col-12 col-md-5">
+                <div class="card shadow-sm border-0 bg-white p-4 h-100">
+                    <h2 class="h5 fw-bold text-secondary mb-3">Préstamos en el período</h2>
+                    <table class="table table-borderless m-0">
+                        <tbody>
+                            <tr><th scope="row" class="text-secondary">Total</th><td id="prestTotal">0</td></tr>
+                            <tr><th scope="row" class="text-secondary">Activos</th><td id="prestActivos">0</td></tr>
+                            <tr><th scope="row" class="text-secondary">Finalizados</th><td id="prestFinalizados">0</td></tr>
+                            <tr><th scope="row" class="text-secondary">Duración promedio</th><td id="prestPromedio">-</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="col-12 col-md-7">
+                <div class="card shadow-sm border-0 bg-white p-4 h-100">
+                    <h2 class="h5 fw-bold text-secondary mb-3">Equipos más prestados</h2>
+                    <div id="graficoPrestados"></div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="w-100 bg-secondary text-white text-center py-3">
+        <p class="m-0 small">&copy; 2026 PeartoS.A</p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <script src="../assets/js/api.js"></script>
+    <script src="../assets/js/sesion.js"></script>
+    <script src="../assets/js/reportes.js"></script>
+</body>
+</html>
