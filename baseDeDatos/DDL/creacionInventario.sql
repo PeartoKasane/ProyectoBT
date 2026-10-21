@@ -16,7 +16,7 @@ CREATE TABLE SALA (
         UNIQUE (tipo, numero)
 );
 
--- Un equipo pertenece siempre a una única sala (RF7: asociar múltiples equipos a un laboratorio determinado)
+/* Un equipo pertenece siempre a una única sala (RF7: asociar múltiples equipos a un laboratorio determinado) */
 CREATE TABLE EQUIPO (
     id INT NOT NULL AUTO_INCREMENT,
     numero INT NOT NULL,
@@ -37,11 +37,11 @@ ALTER TABLE EQUIPO
     REFERENCES SALA (id)
     ON DELETE CASCADE;
 
--- Historial de utilización y modificaciones de cada equipo (RF5)
+/* Historial de utilización y modificaciones de cada equipo (RF5) */
 CREATE TABLE HISTORIAL_EQUIPO (
     id INT NOT NULL AUTO_INCREMENT,
     equipo_id INT NOT NULL,
-    -- Se guarda NULL si el usuario que hizo el cambio fue eliminado más adelante, para no perder el historial
+    /* Se guarda NULL si el usuario que hizo el cambio fue eliminado más adelante, para no perder el historial */
     cedula CHAR(8) DEFAULT NULL,
     accion VARCHAR(30) NOT NULL,
     detalle VARCHAR(255) DEFAULT NULL,

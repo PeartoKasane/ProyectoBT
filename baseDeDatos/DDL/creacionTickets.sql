@@ -14,11 +14,11 @@ CREATE TABLE TICKET (
     cedulaDocente CHAR(8) NOT NULL,
     grupo VARCHAR(20) NOT NULL,
     turno ENUM('Mañana', 'Vespertino', 'Nocturno') NOT NULL,
-    -- 0 = más urgente (RF19: clasificar según gravedad). Se calcula solo a partir de las incidencias cargadas.
+    /* 0 = más urgente (RF19: clasificar según gravedad). Se calcula solo a partir de las incidencias cargadas. */
     prioridad TINYINT NOT NULL DEFAULT 2,
-    -- RF21: estados del ticket
+    /* RF21: estados del ticket */
     estado ENUM('Pendiente', 'Evaluando', 'En proceso', 'Terminado') NOT NULL DEFAULT 'Pendiente',
-    -- RF22: solo un técnico o administrador puede quedar asignado; NULL mientras nadie lo tomó
+    /* RF22: solo un técnico o administrador puede quedar asignado; NULL mientras nadie lo tomó */
     cedulaAsignado CHAR(8) DEFAULT NULL,
     fechaCreacion DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
@@ -26,14 +26,14 @@ CREATE TABLE TICKET (
         PRIMARY KEY (id)
 );
 
--- Detalle de cada equipo declarado en la planilla del ticket (RF17, RF19)
+/* Detalle de cada equipo declarado en la planilla del ticket (RF17, RF19) */
 CREATE TABLE TICKET_EQUIPO (
     id INT NOT NULL AUTO_INCREMENT,
     ticket_id INT NOT NULL,
     equipo_id INT NOT NULL,
     utilizado BOOLEAN NOT NULL DEFAULT TRUE,
     estudiante VARCHAR(100) DEFAULT NULL,
-    -- NULL si el equipo no tuvo incidencia en esa sesión
+    /* NULL si el equipo no tuvo incidencia en esa sesión */
     incidencia ENUM('No prende', 'Teclado roto', 'Mouse roto', 'Monitor roto', 'Otro problema') DEFAULT NULL,
     descripcion VARCHAR(255) DEFAULT NULL,
 
@@ -41,7 +41,7 @@ CREATE TABLE TICKET_EQUIPO (
         PRIMARY KEY (id)
 );
 
--- RF23: comentarios y diagnósticos sobre la incidencia
+/* RF23: comentarios y diagnósticos sobre la incidencia */
 CREATE TABLE TICKET_COMENTARIO (
     id INT NOT NULL AUTO_INCREMENT,
     ticket_id INT NOT NULL,

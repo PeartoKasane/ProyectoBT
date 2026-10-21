@@ -8,17 +8,17 @@ CREATE TABLE USUARIO (
     apellido VARCHAR(50) NOT NULL,
     email VARCHAR(100) DEFAULT NULL,
     claveHash VARCHAR(255) NOT NULL,
-    -- RF36: permite deshabilitar una cuenta sin eliminarla (por ejemplo, una licencia larga)
+    /* RF36: permite deshabilitar una cuenta sin eliminarla (por ejemplo, una licencia larga) */
     activo BOOLEAN NOT NULL DEFAULT TRUE,
     sesionActiva BOOLEAN NOT NULL DEFAULT FALSE,
-    -- Momento en que se inició la sesión activa; sirve para vencerla sola si nadie cerró sesión explícitamente
+    /* Momento en que se inició la sesión activa; sirve para vencerla sola si nadie cerró sesión explícitamente */
     inicioSesion DATETIME DEFAULT NULL,
 
     CONSTRAINT pk_usuario
         PRIMARY KEY (cedula)
 );
 
--- Igual que ADMINISTRADOR/LOGISTICA en sistema-elvis-tek: una tabla por rol, vinculada 1 a 1 con USUARIO
+/* Igual que ADMINISTRADOR/LOGISTICA en sistema-elvis-tek: una tabla por rol, vinculada 1 a 1 con USUARIO */
 CREATE TABLE ADMINISTRADOR (
     cedula CHAR(8) NOT NULL,
 
@@ -40,7 +40,7 @@ CREATE TABLE DIRECCION (
         PRIMARY KEY (cedula)
 );
 
--- El técnico gestiona tickets y solicitudes, pero no usuarios (a diferencia del administrador)
+/* El técnico gestiona tickets y solicitudes, pero no usuarios (a diferencia del administrador) */
 CREATE TABLE TECNICO (
     cedula CHAR(8) NOT NULL,
 

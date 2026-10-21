@@ -7,13 +7,13 @@
 CREATE TABLE PRESTAMO (
     id INT NOT NULL AUTO_INCREMENT,
     solicitud_id INT NOT NULL,
-    -- RF12, RF13: identificación de quien retira los equipos (puede ser un estudiante, no necesariamente un usuario del sistema)
+    /* RF12, RF13: identificación de quien retira los equipos (puede ser un estudiante, no necesariamente un usuario del sistema) */
     solicitanteNombre VARCHAR(100) NOT NULL,
     solicitanteTipoDocumento ENUM('Cédula', 'Pasaporte', 'Otro') NOT NULL,
     solicitanteDocumento VARCHAR(20) NOT NULL,
-    -- Quién gestionó la entrega (administrador o técnico)
+    /* Quién gestionó la entrega (administrador o técnico) */
     cedulaResponsable CHAR(8) NOT NULL,
-    -- RF11: fecha y hora de inicio y finalización del préstamo
+    /* RF11: fecha y hora de inicio y finalización del préstamo */
     fechaHoraInicio DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     fechaHoraFin DATETIME DEFAULT NULL,
     estado ENUM('Activo', 'Finalizado') NOT NULL DEFAULT 'Activo',
@@ -22,7 +22,7 @@ CREATE TABLE PRESTAMO (
         PRIMARY KEY (id)
 );
 
--- RF15: un mismo préstamo puede incluir varios equipos. RF14: "No se usó" se marca al devolver.
+/* RF15: un mismo préstamo puede incluir varios equipos. RF14: "No se usó" se marca al devolver. */
 CREATE TABLE PRESTAMO_EQUIPO (
     id INT NOT NULL AUTO_INCREMENT,
     prestamo_id INT NOT NULL,
