@@ -497,6 +497,68 @@ class SolicitudDAO {
     }
 
     /**
+     * Busca un evento del historial de una solicitud por su identificador.
+     * @param int $idEvento Identificador del evento.
+     * @return array|null El evento (id, solicitud_id, accion, detalle), null si no existe.
+     */
+    public function listarEventoHistorial(int $idEvento): ?array {
+        $sql = "SELECT id, solicitud_id, accion, detalle FROM HISTORIAL_SOLICITUD WHERE id = :idEvento";
+
+        $consulta = $this->conexion->prepare($sql);
+        $consulta->execute(["idEvento" => $idEvento]);
+        $fila = $consulta->fetch(PDO::FETCH_ASSOC);
+        $consulta = null;
+
+        if ($fila === false) {
+            return null;
+        }
+
+        return [
+            "id" => (int) $fila["id"],
+            "idSolicitud" => (int) $fila["solicitud_id"],
+            "accion" => $fila["accion"],
+            "detalle" => $fila["detalle"],
+        ];
+    }
+
+    /**
+     * Corrige el texto de un evento del historial de una solicitud. Es una operación exclusiva del administrador:
+     * la fecha y el usuario que lo originó nunca se modifican, para no alterar la trazabilidad.
+     * @param int $idEvento Identificador del evento.
+     * @param string $accion Nueva acción (hasta 30 caracteres).
+     * @param string|null $detalle Nuevo detalle (hasta 255 caracteres), null para dejarlo vacío.
+     * @return bool TRUE si la operación se completa correctamente, FALSE en caso contrario.
+     */
+    public function modificarEventoHistorial(int $idEvento, string $accion, ?string $detalle): bool {
+        try {
+            $sql = "UPDATE HISTORIAL_SOLICITUD SET accion = :accion, detalle = :detalle WHERE id = :idEvento";
+            $consulta = $this->conexion->prepare($sql);
+            $consulta->execute(["accion" => $accion, "detalle" => $detalle, "idEvento" => $idEvento]);
+
+            return true;
+        } catch (PDOException $error) {
+            return false;
+        }
+    }
+
+    /**
+     * Elimina un evento del historial de una solicitud. Es una operación exclusiva del administrador.
+     * @param int $idEvento Identificador del evento.
+     * @return bool TRUE si la operación se completa correctamente, FALSE en caso contrario.
+     */
+    public function eliminarEventoHistorial(int $idEvento): bool {
+        try {
+            $sql = "DELETE FROM HISTORIAL_SOLICITUD WHERE id = :idEvento";
+            $consulta = $this->conexion->prepare($sql);
+            $consulta->execute(["idEvento" => $idEvento]);
+
+            return true;
+        } catch (PDOException $error) {
+            return false;
+        }
+    }
+
+    /**
      * Convierte todas las filas de la consulta de solicitudes en arreglos listos para JSON.
      */
     private function mapearSolicitudes(array $filas): array {

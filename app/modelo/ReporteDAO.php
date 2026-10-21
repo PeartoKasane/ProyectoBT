@@ -11,6 +11,10 @@
 class ReporteDAO {
     private PDO $conexion;
 
+    /**
+     * Constructor parametrizado que recibe una conexión a la base de datos.
+     * @param PDO $conexion La conexión a la base de datos. PRECONDICIÓN: No debe ser NULL.
+     */
     public function __construct(PDO $conexion) {
         $this->conexion = $conexion;
     }
@@ -76,7 +80,7 @@ class ReporteDAO {
             JOIN SALA AS s ON s.id = e.idSala
             JOIN TICKET AS t ON t.id = te.ticket_id
             WHERE te.incidencia IS NOT NULL AND t.fecha BETWEEN :desde AND :hasta
-            GROUP BY e.id
+            GROUP BY e.id, e.numero, s.tipo, s.numero
             ORDER BY totalIncidencias DESC
             LIMIT 10
         ";
@@ -97,7 +101,7 @@ class ReporteDAO {
             FROM TICKET AS t
             JOIN SALA AS s ON s.id = t.idSala
             WHERE t.fecha BETWEEN :desde AND :hasta
-            GROUP BY s.id
+            GROUP BY s.id, s.tipo, s.numero
             ORDER BY totalTickets DESC
         ";
         $consulta = $this->conexion->prepare($sql);
@@ -111,6 +115,7 @@ class ReporteDAO {
     /**
      * RF41: métricas de préstamos y devoluciones, dentro del rango de fechas.
      * Si no hay préstamos en el rango, las sumas y el promedio llegan como NULL.
+     * AVG() ignora los NULL: un préstamo sin devolver (fechaHoraFin NULL) no entra en el promedio de horas.
      */
     public function obtenerMetricasPrestamos(string $desde, string $hasta): array {
         $sql = "
@@ -118,7 +123,7 @@ class ReporteDAO {
                 COUNT(*) AS totalPrestamos,
                 SUM(estado = 'Activo') AS activos,
                 SUM(estado = 'Finalizado') AS finalizados,
-                AVG(CASE WHEN fechaHoraFin IS NOT NULL THEN TIMESTAMPDIFF(HOUR, fechaHoraInicio, fechaHoraFin) END) AS promedioHoras
+                AVG(TIMESTAMPDIFF(HOUR, fechaHoraInicio, fechaHoraFin)) AS promedioHoras
             FROM PRESTAMO
             WHERE DATE(fechaHoraInicio) BETWEEN :desde AND :hasta
         ";
@@ -141,7 +146,7 @@ class ReporteDAO {
             JOIN SALA AS s ON s.id = e.idSala
             JOIN PRESTAMO AS p ON p.id = pe.prestamo_id
             WHERE DATE(p.fechaHoraInicio) BETWEEN :desde AND :hasta
-            GROUP BY e.id
+            GROUP BY e.id, e.numero, s.tipo, s.numero
             ORDER BY totalPrestamos DESC
             LIMIT 10
         ";
@@ -163,10 +168,10 @@ class ReporteDAO {
                 u.cedula,
                 u.nombre,
                 u.apellido,
-                a.cedula IS NOT NULL AS administrador,
-                d.cedula IS NOT NULL AS docente,
-                dir.cedula IS NOT NULL AS direccion,
-                t.cedula IS NOT NULL AS tecnico
+                IF(a.cedula IS NOT NULL, TRUE, FALSE) AS administrador,
+                IF(d.cedula IS NOT NULL, TRUE, FALSE) AS docente,
+                IF(dir.cedula IS NOT NULL, TRUE, FALSE) AS direccion,
+                IF(t.cedula IS NOT NULL, TRUE, FALSE) AS tecnico
             FROM USUARIO AS u
             LEFT JOIN ADMINISTRADOR AS a ON a.cedula = u.cedula
             LEFT JOIN DOCENTE AS d ON d.cedula = u.cedula

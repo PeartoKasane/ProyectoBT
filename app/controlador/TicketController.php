@@ -137,6 +137,9 @@ class TicketController {
         return is_string($_GET["recurso"] ?? null) ? trim($_GET["recurso"]) : "";
     }
 
+    /**
+     * GET sin parámetros lista los tickets; con ?id= retorna el detalle de un ticket.
+     */
     private function listar(): void {
         if (isset($_GET["id"])) {
             //Si el valor no es texto (por ejemplo ?id[]=1) se lo trata como vacío, y detalle() responde error
@@ -146,6 +149,9 @@ class TicketController {
         }
     }
 
+    /**
+     * Retorna los tickets que el rol puede ver: todos para administrador, técnico y dirección; solo los propios para el docente.
+     */
     private function listarTickets(): void {
         $conexion = Conexion::conectar();
         $dao = new TicketDAO($conexion);
@@ -681,6 +687,11 @@ class TicketController {
         }
     }
 
+    /**
+     * Cambia el estado de un ticket (PATCH con "estado"). Solo administrador y técnico.
+     * @param int $idTicket Identificador del ticket.
+     * @param string $estado Nuevo estado: Pendiente, Evaluando, En proceso o Terminado.
+     */
     private function cambiarEstado(int $idTicket, string $estado): void {
         if (!in_array($estado, self::ESTADOS, true)) {
             RespuestaJson::error("Estado inválido", 422);
@@ -704,6 +715,11 @@ class TicketController {
         RespuestaJson::exito(["mensaje" => "Estado actualizado"]);
     }
 
+    /**
+     * Asigna un responsable al ticket (PATCH con "cedulaAsignado"). El administrador elige a cualquier técnico; el técnico solo puede asignárselo a sí mismo.
+     * @param int $idTicket Identificador del ticket.
+     * @param string $cedulaAsignado Cédula del técnico a asignar.
+     */
     private function asignar(int $idTicket, string $cedulaAsignado): void {
         //RF22: el técnico solo puede autoasignarse; el administrador puede asignar a cualquier técnico
         $soloTecnico = $this->tieneRol("tecnico") && !$this->tieneRol("administrador");

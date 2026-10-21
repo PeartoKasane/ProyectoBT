@@ -2,7 +2,8 @@
 
 /**
  * DAO ~ Data Access Object de la tabla ACTIVIDAD (RNF4).
- * Es un registro de auditoría: solo se agregan y consultan filas, nunca se modifican ni se borran desde el sistema.
+ * Es un registro de auditoría: las filas las agrega el sistema automáticamente y solo el administrador
+ * puede corregir su detalle o eliminarlas (modificarDetalle() y eliminar()).
  */
 class ActividadDAO {
     private PDO $conexion;
@@ -71,5 +72,56 @@ class ActividadDAO {
         $consulta->execute();
 
         return $consulta->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * Busca un registro de actividad por su identificador.
+     * @param int $idActividad Identificador del registro.
+     * @return array|null El registro (id, cedula, metodo, ruta, recurso, detalle, estado, fecha), null si no existe.
+     */
+    public function listarRegistro(int $idActividad): ?array {
+        $sql = "SELECT id, cedula, metodo, ruta, recurso, detalle, estado, fecha FROM ACTIVIDAD WHERE id = :idActividad";
+
+        $consulta = $this->conexion->prepare($sql);
+        $consulta->execute(["idActividad" => $idActividad]);
+        $fila = $consulta->fetch(PDO::FETCH_ASSOC);
+        $consulta = null;
+
+        return $fila === false ? null : $fila;
+    }
+
+    /**
+     * Corrige el detalle de un registro de actividad. El usuario, la operación y la fecha nunca se modifican.
+     * @param int $idActividad Identificador del registro.
+     * @param string|null $detalle Nuevo detalle (hasta 255 caracteres), null para dejarlo vacío.
+     * @return bool TRUE si la operación se completa correctamente, FALSE en caso contrario.
+     */
+    public function modificarDetalle(int $idActividad, ?string $detalle): bool {
+        try {
+            $sql = "UPDATE ACTIVIDAD SET detalle = :detalle WHERE id = :idActividad";
+            $consulta = $this->conexion->prepare($sql);
+            $consulta->execute(["detalle" => $detalle, "idActividad" => $idActividad]);
+
+            return true;
+        } catch (PDOException $error) {
+            return false;
+        }
+    }
+
+    /**
+     * Elimina un registro de actividad.
+     * @param int $idActividad Identificador del registro.
+     * @return bool TRUE si la operación se completa correctamente, FALSE en caso contrario.
+     */
+    public function eliminar(int $idActividad): bool {
+        try {
+            $sql = "DELETE FROM ACTIVIDAD WHERE id = :idActividad";
+            $consulta = $this->conexion->prepare($sql);
+            $consulta->execute(["idActividad" => $idActividad]);
+
+            return true;
+        } catch (PDOException $error) {
+            return false;
+        }
     }
 }

@@ -2,7 +2,12 @@
 //Instalación del driver https://www.php.net/manual/en/pdo.installation.php
 //Especificar en php.ini el extension_dir (debe apuntar a ext) y la extension pdo_mysql para este caso
 
-//SINGLETON
+/**
+ * Clase que gestiona la conexión a la base de datos mediante PDO.
+ *
+ * SINGLETON ~ Patrón de diseño que garantiza una única instancia de la clase en toda la petición,
+ * así todos los DAO comparten la misma conexión.
+ */
 class ConectorPDO {
     private string $servername;
     private int $port;
@@ -15,7 +20,14 @@ class ConectorPDO {
     //?self = ?ConectorPDO
     private static ?self $instancia = null;
 
-    //El constructor es privado y nunca se referencia directamente, la única forma de obtener el objeto es obtenerInstancia()
+    /**
+     * Constructor privado: solo obtenerInstancia() puede crear el objeto (Singleton).
+     * @param string $servername Servidor de la base de datos.
+     * @param int $port Puerto de la base de datos.
+     * @param string $username Usuario de la base de datos.
+     * @param string $password Contraseña de la base de datos.
+     * @param string $dbname Nombre de la base de datos.
+     */
     private function __construct(string $servername, int $port, string $username, string $password, string $dbname) {
         $this->servername = $servername;
         $this->port = $port;
@@ -25,20 +37,32 @@ class ConectorPDO {
         $this->conexion = null;
     }
 
-    //Se restringe la posibilidad de clonar el objeto
+    /**
+     * Se restringe la posibilidad de clonar el objeto.
+     */
     private function __clone(): void {}
 
-    //Se previene la manipulación del objeto para que no pueda ser deserializado, la deserialización genera una copia sobre una nueva instancia
+    /**
+     * Se previene la deserialización, que generaría una copia sobre una nueva instancia.
+     * @throws Exception Siempre.
+     */
     public function __wakeup(): void {
         throw new Exception("No se puede deserializar un Singleton.");
     }
 
-    //Se evita la posibilidad de serializar un objeto
+    /**
+     * Se evita la posibilidad de serializar el objeto.
+     * @throws LogicException Siempre.
+     */
     public function __serialize(): array {
         throw new LogicException("El objeto no puede serializarse.");
     }
 
-    //Se evita la posibilidad de deserializar un objeto
+    /**
+     * Se evita la posibilidad de deserializar el objeto.
+     * @param array $data Datos serializados, nunca se utilizan.
+     * @throws LogicException Siempre.
+     */
     public function __unserialize(array $data): void {
         throw new LogicException("El objeto no puede deserializarse.");
     }
@@ -79,6 +103,9 @@ class ConectorPDO {
         return $this->conexion;
     }
 
+    /**
+     * Cierra la conexión liberando el objeto PDO. La próxima llamada a establecerConexion() abre una nueva.
+     */
     public function desconectar(): void {
         $this->conexion = null;
     }

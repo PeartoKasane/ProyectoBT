@@ -380,6 +380,68 @@ class InventarioDAO {
     }
 
     /**
+     * Busca un evento del historial de un equipo por su identificador.
+     * @param int $idEvento Identificador del evento.
+     * @return array|null El evento (id, equipo_id, accion, detalle), null si no existe.
+     */
+    public function listarEventoHistorial(int $idEvento): ?array {
+        $sql = "SELECT id, equipo_id, accion, detalle FROM HISTORIAL_EQUIPO WHERE id = :idEvento";
+
+        $consulta = $this->conexion->prepare($sql);
+        $consulta->execute(["idEvento" => $idEvento]);
+        $fila = $consulta->fetch(PDO::FETCH_ASSOC);
+        $consulta = null;
+
+        if ($fila === false) {
+            return null;
+        }
+
+        return [
+            "id" => (int) $fila["id"],
+            "idEquipo" => (int) $fila["equipo_id"],
+            "accion" => $fila["accion"],
+            "detalle" => $fila["detalle"],
+        ];
+    }
+
+    /**
+     * Corrige el texto de un evento del historial de un equipo. Es una operación exclusiva del administrador:
+     * la fecha y el usuario que lo originó nunca se modifican, para no alterar la trazabilidad.
+     * @param int $idEvento Identificador del evento.
+     * @param string $accion Nueva acción (hasta 30 caracteres).
+     * @param string|null $detalle Nuevo detalle (hasta 255 caracteres), null para dejarlo vacío.
+     * @return bool TRUE si la operación se completa correctamente, FALSE en caso contrario.
+     */
+    public function modificarEventoHistorial(int $idEvento, string $accion, ?string $detalle): bool {
+        try {
+            $sql = "UPDATE HISTORIAL_EQUIPO SET accion = :accion, detalle = :detalle WHERE id = :idEvento";
+            $consulta = $this->conexion->prepare($sql);
+            $consulta->execute(["accion" => $accion, "detalle" => $detalle, "idEvento" => $idEvento]);
+
+            return true;
+        } catch (PDOException $error) {
+            return false;
+        }
+    }
+
+    /**
+     * Elimina un evento del historial de un equipo. Es una operación exclusiva del administrador.
+     * @param int $idEvento Identificador del evento.
+     * @return bool TRUE si la operación se completa correctamente, FALSE en caso contrario.
+     */
+    public function eliminarEventoHistorial(int $idEvento): bool {
+        try {
+            $sql = "DELETE FROM HISTORIAL_EQUIPO WHERE id = :idEvento";
+            $consulta = $this->conexion->prepare($sql);
+            $consulta->execute(["idEvento" => $idEvento]);
+
+            return true;
+        } catch (PDOException $error) {
+            return false;
+        }
+    }
+
+    /**
      * Convierte una fila de SALA en un arreglo con los tipos correctos.
      */
     private function mapearSala(array $fila): array {

@@ -8,6 +8,15 @@ require_once RUTA_VISTA . "/RespuestaJson.php";
 require_once RUTA_NUCLEO . "/Conexion.php";
 require_once RUTA_NUCLEO . "/Token.php";
 
+/**
+ * Controlador de la API del inventario tecnológico (RF1 a RF8). Responde siempre en JSON.
+ * Gestiona salas, equipos y el historial de cada equipo con el parámetro ?recurso=salas, equipos o historial.
+ *
+ * - Consultar: todos los roles (RF4).
+ * - Alta, modificación y baja de salas, equipos y eventos del historial: solo el administrador (RF3, RF6).
+ *
+ * GET = consultar, POST = registrar, PUT = modificar, DELETE = eliminar.
+ */
 class InventarioController {
     //Valores que el sistema acepta (los mismos que los ENUM de la base de datos)
     private const ESTADOS = ["Funcionando", "Incidencia", "Fuera de servicio"];
@@ -113,6 +122,9 @@ class InventarioController {
         }
     }
 
+    /**
+     * Retorna todas las salas, cada una con la lista de sus equipos (GET sin parámetros).
+     */
     private function listarInventario(): void {
         $conexion = Conexion::conectar();
         $dao = new InventarioDAO($conexion);
@@ -123,6 +135,10 @@ class InventarioController {
         RespuestaJson::exito($salas);
     }
 
+    /**
+     * Retorna una sala con sus equipos (GET con ?idSala=).
+     * @param string $id Identificador de la sala recibido en la URL, todavía sin validar.
+     */
     private function listarSala(string $id): void {
         if ($id === "") {
             RespuestaJson::error("El id de la sala es obligatorio", 400);
@@ -282,13 +298,15 @@ class InventarioController {
     }
 
     /**
-     * PUT con ?recurso=salas modifica una sala; con ?recurso=equipos modifica un equipo.
+     * PUT con ?recurso=salas modifica una sala; con ?recurso=equipos modifica un equipo;
+     * con ?recurso=historial corrige un evento del historial de equipos.
      */
     private function modificar(): void {
         match ($this->recurso()) {
             "salas" => $this->modificarSala(),
             "equipos" => $this->modificarEquipo(),
-            default => RespuestaJson::error("Recurso inválido, use ?recurso=salas o ?recurso=equipos", 400),
+            "historial" => $this->modificarHistorial(),
+            default => RespuestaJson::error("Recurso inválido, use ?recurso=salas, ?recurso=equipos o ?recurso=historial", 400),
         };
     }
 
@@ -387,13 +405,19 @@ class InventarioController {
     }
 
     /**
-     * RF3, RF6: elimina una sala (junto con sus equipos) o un equipo. Espera {"id": 1} con ?recurso=salas o ?recurso=equipos.
+     * RF3, RF6: elimina una sala (junto con sus equipos), un equipo o un evento del historial.
+     * Espera {"id": 1} con ?recurso=salas, ?recurso=equipos o ?recurso=historial.
      */
     private function baja(): void {
         $recurso = $this->recurso();
 
+        if ($recurso === "historial") {
+            $this->eliminarHistorial();
+            return;
+        }
+
         if ($recurso !== "salas" && $recurso !== "equipos") {
-            RespuestaJson::error("Recurso inválido, use ?recurso=salas o ?recurso=equipos", 400);
+            RespuestaJson::error("Recurso inválido, use ?recurso=salas, ?recurso=equipos o ?recurso=historial", 400);
         }
 
         $datos = $this->leerJson();
@@ -434,5 +458,77 @@ class InventarioController {
         }
 
         RespuestaJson::exito(["mensaje" => $mensajeExito]);
+    }
+
+    /**
+     * Corrige un evento del historial de un equipo. Espera {"id": 1, "accion": "Modificación", "detalle": "Texto"}.
+     * Solo el administrador. Es una bitácora: la fecha y el usuario que originó el evento no se pueden cambiar.
+     */
+    private function modificarHistorial(): void {
+        $datos = $this->leerJson();
+
+        $idEvento = $this->aEntero($datos["id"] ?? null);
+        $accion = $this->texto($datos, "accion");
+        $detalle = $this->texto($datos, "detalle");
+
+        if ($idEvento === null || $accion === "") {
+            RespuestaJson::error("Existen campos vacíos o inválidos", 422);
+        }
+
+        if (mb_strlen($accion) > 30) {
+            RespuestaJson::error("La acción admite hasta 30 caracteres", 422);
+        }
+
+        if (mb_strlen($detalle) > 255) {
+            RespuestaJson::error("El detalle admite hasta 255 caracteres", 422);
+        }
+
+        $conexion = Conexion::conectar();
+        $dao = new InventarioDAO($conexion);
+
+        if ($dao->listarEventoHistorial($idEvento) === null) {
+            Conexion::desconectar();
+            RespuestaJson::error("El evento del historial no existe", 404);
+        }
+
+        //Un detalle vacío se guarda como NULL, igual que cuando el sistema registra el evento sin detalle
+        $resultado = $dao->modificarEventoHistorial($idEvento, $accion, $detalle !== "" ? $detalle : null);
+        Conexion::desconectar();
+
+        if (!$resultado) {
+            RespuestaJson::error("No se pudo modificar el evento del historial", 400);
+        }
+
+        RespuestaJson::exito(["mensaje" => "Evento del historial modificado exitosamente"]);
+    }
+
+    /**
+     * Elimina un evento del historial de un equipo. Espera {"id": 1}. Solo el administrador.
+     */
+    private function eliminarHistorial(): void {
+        $datos = $this->leerJson();
+
+        $idEvento = $this->aEntero($datos["id"] ?? null);
+
+        if ($idEvento === null) {
+            RespuestaJson::error("Falta el id del evento o es incorrecto", 422);
+        }
+
+        $conexion = Conexion::conectar();
+        $dao = new InventarioDAO($conexion);
+
+        if ($dao->listarEventoHistorial($idEvento) === null) {
+            Conexion::desconectar();
+            RespuestaJson::error("El evento del historial no existe", 404);
+        }
+
+        $resultado = $dao->eliminarEventoHistorial($idEvento);
+        Conexion::desconectar();
+
+        if (!$resultado) {
+            RespuestaJson::error("No se pudo eliminar el evento del historial", 400);
+        }
+
+        RespuestaJson::exito(["mensaje" => "Evento del historial eliminado exitosamente"]);
     }
 }

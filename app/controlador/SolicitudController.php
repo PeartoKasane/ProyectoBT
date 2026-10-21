@@ -28,6 +28,7 @@ require_once RUTA_NUCLEO . "/Token.php";
  * - Editar o eliminar una solicitud: el administrador, o el docente dueño mientras esté Pendiente.
  *   No se puede editar con un préstamo activo ni eliminar si tiene algún préstamo registrado.
  * - Editar o eliminar un comentario: su autor o el administrador.
+ * - Corregir o eliminar un evento del historial (?recurso=historial): solo el administrador.
  */
 class SolicitudController {
     //Valores que el sistema acepta (los mismos que los ENUM de la base de datos)
@@ -150,6 +151,9 @@ class SolicitudController {
         }
     }
 
+    /**
+     * Retorna las solicitudes que el rol puede ver: todas para administrador, técnico y dirección; solo las propias para el docente.
+     */
     private function listarSolicitudes(): void {
         $conexion = Conexion::conectar();
         $dao = new SolicitudDAO($conexion);
@@ -435,6 +439,11 @@ class SolicitudController {
         }
     }
 
+    /**
+     * Cambia el estado de una solicitud (PATCH con "estado"). Solo administrador y técnico.
+     * @param int $idSolicitud Identificador de la solicitud.
+     * @param string $estado Nuevo estado: Pendiente, En proceso o Resuelta.
+     */
     private function cambiarEstado(int $idSolicitud, string $estado): void {
         if (!in_array($estado, self::ESTADOS, true)) {
             RespuestaJson::error("Estado inválido", 422);
@@ -458,6 +467,11 @@ class SolicitudController {
         RespuestaJson::exito(["mensaje" => "Estado actualizado"]);
     }
 
+    /**
+     * Asigna un responsable a la solicitud (PATCH con "cedulaAsignado"). El administrador elige a cualquier técnico; el técnico solo puede asignársela a sí mismo.
+     * @param int $idSolicitud Identificador de la solicitud.
+     * @param string $cedulaAsignado Cédula del técnico a asignar.
+     */
     private function asignar(int $idSolicitud, string $cedulaAsignado): void {
         //RF30: el técnico solo puede autoasignarse; el administrador puede asignar a cualquier técnico
         $soloTecnico = $this->tieneRol("tecnico") && !$this->tieneRol("administrador");
@@ -521,12 +535,14 @@ class SolicitudController {
     }
 
     /**
-     * PUT sin ?recurso= edita una solicitud; PUT con ?recurso=comentarios edita un comentario.
+     * PUT sin ?recurso= edita una solicitud; PUT con ?recurso=comentarios edita un comentario;
+     * PUT con ?recurso=historial corrige un evento del historial (solo administrador).
      */
     private function editar(): void {
         match ($this->recurso()) {
             "" => $this->editarSolicitud(),
             "comentarios" => $this->editarComentario(),
+            "historial" => $this->exigirAdministradorHistorial(fn() => $this->modificarHistorial()),
             default => RespuestaJson::error("Recurso inexistente", 404),
         };
     }
@@ -646,12 +662,14 @@ class SolicitudController {
     }
 
     /**
-     * DELETE sin ?recurso= elimina una solicitud; DELETE con ?recurso=comentarios elimina un comentario.
+     * DELETE sin ?recurso= elimina una solicitud; DELETE con ?recurso=comentarios elimina un comentario;
+     * DELETE con ?recurso=historial elimina un evento del historial (solo administrador).
      */
     private function baja(): void {
         match ($this->recurso()) {
             "" => $this->eliminarSolicitud(),
             "comentarios" => $this->eliminarComentario(),
+            "historial" => $this->exigirAdministradorHistorial(fn() => $this->eliminarHistorial()),
             default => RespuestaJson::error("Recurso inexistente", 404),
         };
     }
@@ -728,5 +746,90 @@ class SolicitudController {
         }
 
         RespuestaJson::exito(["mensaje" => "Comentario eliminado exitosamente"]);
+    }
+
+    /**
+     * El historial es una bitácora de auditoría: solo el administrador puede corregirla o eliminarla.
+     * Si el usuario no lo es responde 403 y detiene la ejecución; si lo es, ejecuta la operación recibida.
+     * @param callable $operacion Operación a ejecutar (modificarHistorial() o eliminarHistorial()).
+     */
+    private function exigirAdministradorHistorial(callable $operacion): void {
+        if (!$this->tieneRol("administrador")) {
+            RespuestaJson::error("Acceso denegado: rol incorrecto", 403);
+        }
+
+        $operacion();
+    }
+
+    /**
+     * Corrige un evento del historial de una solicitud. Espera {"id": 1, "accion": "Modificación", "detalle": "Texto"}.
+     * Solo el administrador. Es una bitácora: la fecha y el usuario que originó el evento no se pueden cambiar.
+     */
+    private function modificarHistorial(): void {
+        $datos = $this->leerJson();
+
+        $idEvento = $this->aEntero($datos["id"] ?? null);
+        $accion = $this->texto($datos, "accion");
+        $detalle = $this->texto($datos, "detalle");
+
+        if ($idEvento === null || $accion === "") {
+            RespuestaJson::error("Existen campos vacíos o inválidos", 422);
+        }
+
+        if (mb_strlen($accion) > 30) {
+            RespuestaJson::error("La acción admite hasta 30 caracteres", 422);
+        }
+
+        if (mb_strlen($detalle) > 255) {
+            RespuestaJson::error("El detalle admite hasta 255 caracteres", 422);
+        }
+
+        $conexion = Conexion::conectar();
+        $dao = new SolicitudDAO($conexion);
+
+        if ($dao->listarEventoHistorial($idEvento) === null) {
+            Conexion::desconectar();
+            RespuestaJson::error("El evento del historial no existe", 404);
+        }
+
+        //Un detalle vacío se guarda como NULL, igual que cuando el sistema registra el evento sin detalle
+        $resultado = $dao->modificarEventoHistorial($idEvento, $accion, $detalle !== "" ? $detalle : null);
+        Conexion::desconectar();
+
+        if (!$resultado) {
+            RespuestaJson::error("No se pudo modificar el evento del historial", 400);
+        }
+
+        RespuestaJson::exito(["mensaje" => "Evento del historial modificado exitosamente"]);
+    }
+
+    /**
+     * Elimina un evento del historial de una solicitud. Espera {"id": 1}. Solo el administrador.
+     */
+    private function eliminarHistorial(): void {
+        $datos = $this->leerJson();
+
+        $idEvento = $this->aEntero($datos["id"] ?? null);
+
+        if ($idEvento === null) {
+            RespuestaJson::error("Falta el id del evento o es incorrecto", 422);
+        }
+
+        $conexion = Conexion::conectar();
+        $dao = new SolicitudDAO($conexion);
+
+        if ($dao->listarEventoHistorial($idEvento) === null) {
+            Conexion::desconectar();
+            RespuestaJson::error("El evento del historial no existe", 404);
+        }
+
+        $resultado = $dao->eliminarEventoHistorial($idEvento);
+        Conexion::desconectar();
+
+        if (!$resultado) {
+            RespuestaJson::error("No se pudo eliminar el evento del historial", 400);
+        }
+
+        RespuestaJson::exito(["mensaje" => "Evento del historial eliminado exitosamente"]);
     }
 }

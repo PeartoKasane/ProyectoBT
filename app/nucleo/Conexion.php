@@ -9,6 +9,10 @@ require_once RUTA_VISTA . "/RespuestaJson.php";
  */
 class Conexion {
 
+    /**
+     * Obtiene la instancia única de ConectorPDO con los datos del archivo .env.
+     * @return ConectorPDO El conector de la base de datos.
+     */
     private static function obtenerConector(): ConectorPDO {
         return ConectorPDO::obtenerInstancia($_ENV['DB_HOST'], (int) $_ENV['DB_PUERTO'], $_ENV['DB_USUARIO'], $_ENV['DB_CLAVE'], $_ENV['DB_NOMBRE']);
     }

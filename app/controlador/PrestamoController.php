@@ -204,6 +204,9 @@ class PrestamoController {
         }
     }
 
+    /**
+     * Retorna todos los préstamos, del más reciente al más antiguo (GET sin parámetros).
+     */
     private function listarPrestamos(): void {
         $conexion = Conexion::conectar();
         $dao = new PrestamoDAO($conexion);

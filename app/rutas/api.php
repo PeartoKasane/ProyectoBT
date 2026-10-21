@@ -11,6 +11,7 @@ require_once RUTA_CONTROLADOR . "/ActividadController.php";
 
 //Espacio donde se encuentran los endpoints que establecen la comunicación con el controlador
 //Cada ruta se invoca desde el frontend como index.php?ruta=<nombre>
+//Si la ruta no coincide con ninguna, el default responde 404 en JSON
 switch ($ruta) {
     case "login":
         $controlador = new LoginController();

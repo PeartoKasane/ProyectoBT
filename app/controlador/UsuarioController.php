@@ -72,6 +72,9 @@ class UsuarioController {
         return is_string($datos[$campo] ?? null) ? $datos[$campo] : "";
     }
 
+    /**
+     * GET sin parámetros lista todos los usuarios; con ?cedula= retorna uno solo.
+     */
     private function listar(): void {
         if (isset($_GET["cedula"])) {
             //En caso de recibir datos mediante la superglobal, se busca un usuario específico
@@ -82,6 +85,10 @@ class UsuarioController {
         }
     }
 
+    /**
+     * Retorna los datos públicos de un usuario (sin la contraseña).
+     * @param string $cedula Cédula recibida en la URL, todavía sin validar.
+     */
     private function listarUsuario(string $cedula): void {
         if ($cedula === "") {
             RespuestaJson::error("La cédula es obligatoria", 400);
@@ -103,6 +110,9 @@ class UsuarioController {
         RespuestaJson::exito($usuario);
     }
 
+    /**
+     * Retorna los datos públicos de todos los usuarios (sin la contraseña).
+     */
     private function listarUsuarios(): void {
         $conexion = Conexion::conectar();
         $dao = new UsuarioDAO($conexion);
@@ -113,6 +123,9 @@ class UsuarioController {
         RespuestaJson::exito($usuarios);
     }
 
+    /**
+     * Registra un usuario con su rol (POST). Valida los datos, guarda la contraseña con password_hash y rechaza cédulas repetidas.
+     */
     private function alta(): void {
         $datos = $this->leerJson();
 
@@ -162,6 +175,9 @@ class UsuarioController {
         RespuestaJson::exito(["mensaje" => "Empleado ingresado exitosamente"], 201);
     }
 
+    /**
+     * Modifica los datos de un usuario y su rol (PUT). La contraseña se vuelve a exigir y pasa a ser la de la cuenta.
+     */
     private function modificar(): void {
         $datos = $this->leerJson();
 
@@ -260,6 +276,9 @@ class UsuarioController {
         RespuestaJson::exito(["mensaje" => $activo ? "Cuenta habilitada" : "Cuenta deshabilitada"]);
     }
 
+    /**
+     * Elimina un usuario (DELETE). Un administrador no puede eliminarse a sí mismo; si el usuario tiene registros asociados se debe deshabilitar.
+     */
     private function baja(): void {
         $datos = $this->leerJson();
 

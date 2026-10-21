@@ -48,6 +48,12 @@ class RespuestaJson {
         self::enviar($status, $mensaje, null);
     }
 
+    /**
+     * Arma el contrato único {status, message, data}, lo envía con el código HTTP indicado y termina la ejecución.
+     * @param int $status Código de estado HTTP.
+     * @param string $mensaje Texto legible para el usuario.
+     * @param mixed $datos Información devuelta, o null cuando no hay.
+     */
     private static function enviar(int $status, string $mensaje, $datos): void {
         http_response_code($status);
         header("Content-Type: application/json; charset=utf-8");

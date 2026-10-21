@@ -36,26 +36,10 @@ class UsuarioDAO {
                 u.activo,
                 u.sesionActiva,
                 u.inicioSesion,
-
-                CASE
-                    WHEN a.cedula IS NOT NULL THEN TRUE
-                    ELSE FALSE
-                END AS administrador,
-
-                CASE
-                    WHEN d.cedula IS NOT NULL THEN TRUE
-                    ELSE FALSE
-                END AS docente,
-
-                CASE
-                    WHEN dir.cedula IS NOT NULL THEN TRUE
-                    ELSE FALSE
-                END AS direccion,
-
-                CASE
-                    WHEN t.cedula IS NOT NULL THEN TRUE
-                    ELSE FALSE
-                END AS tecnico
+                IF(a.cedula IS NOT NULL, TRUE, FALSE) AS administrador,
+                IF(d.cedula IS NOT NULL, TRUE, FALSE) AS docente,
+                IF(dir.cedula IS NOT NULL, TRUE, FALSE) AS direccion,
+                IF(t.cedula IS NOT NULL, TRUE, FALSE) AS tecnico
 
             FROM USUARIO AS u
 

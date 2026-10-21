@@ -11,6 +11,7 @@ require_once RUTA_NUCLEO . "/Conexion.php";
  * Nunca se guardan contraseñas ni el cuerpo completo: únicamente algunos identificadores.
  */
 class Actividad {
+    //Solo las operaciones que modifican datos se registran, las consultas (GET) no
     private const METODOS_REGISTRADOS = ["POST", "PUT", "PATCH", "DELETE"];
 
     //Campos del cuerpo JSON que se anotan en el detalle (identifican sobre qué se operó)
@@ -61,6 +62,11 @@ class Actividad {
         });
     }
 
+    /**
+     * Arma el texto del campo "detalle" a partir del cuerpo JSON de la petición, anotando solo los campos de CAMPOS_DETALLE.
+     * @param string|false $cuerpo Cuerpo de la petición tal como lo devuelve file_get_contents().
+     * @return string|null El detalle (por ejemplo "id=5 estado=Terminado", hasta 255 caracteres), null si no hay nada que anotar.
+     */
     private static function armarDetalle(string|false $cuerpo): ?string {
         $datos = json_decode($cuerpo === false ? "" : $cuerpo, true);
 

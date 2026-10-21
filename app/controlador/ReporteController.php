@@ -69,6 +69,9 @@ class ReporteController {
         return is_string($_GET["recurso"] ?? null) ? trim($_GET["recurso"]) : "";
     }
 
+    /**
+     * Valida el rango de fechas y retorna los reportes y estadísticas (GET). Con ?recurso=personal retorna el resumen de personal (solo dirección).
+     */
     private function consultar(): void {
         match ($this->recurso()) {
             "" => $this->generarReportes(),
