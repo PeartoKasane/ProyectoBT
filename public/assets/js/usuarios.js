@@ -244,7 +244,7 @@ async function actualizarTabla() {
     cuerpoTablaUsuarios.replaceChildren();
 
     try {
-        // GET index.php?ruta=usuarios
+        //GET index.php?ruta=usuarios
         const usuarios = await obtenerUsuarios();
 
         //Genera una fila por usuario
@@ -259,7 +259,7 @@ async function actualizarTabla() {
 //Abre el modal con los datos actuales del usuario para poder modificarlos
 async function abrirModificarUsuario(cedula) {
     try {
-        // GET index.php?ruta=usuarios&cedula={cedula}
+        //GET index.php?ruta=usuarios&cedula={cedula}
         const usuarioAModificar = await obtenerUsuario(cedula);
 
         limpiarEstadoGestionarUsuario();
@@ -297,9 +297,11 @@ async function gestionarUsuario(eventoFormulario) {
 
         let resultado;
 
-        if (!usuarioEnEdicion) { // POST index.php?ruta=usuarios
+        //POST index.php?ruta=usuarios
+        if (!usuarioEnEdicion) {
             resultado = await altaUsuario(usuario);
-        } else { // PUT index.php?ruta=usuarios
+        } else {
+            //PUT index.php?ruta=usuarios
             resultado = await modificarUsuario(usuario);
         }
 
@@ -327,5 +329,5 @@ btnAltaUsuario.addEventListener("click", abrirAltaUsuario);
 //Al cerrar el modal (con la X, Escape o haciendo clic afuera) se limpia el estado del formulario
 elementoModal.addEventListener("hidden.bs.modal", limpiarEstadoGestionarUsuario);
 
-// GET index.php?ruta=usuarios
+//GET index.php?ruta=usuarios
 actualizarTabla();

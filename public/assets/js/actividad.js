@@ -30,6 +30,7 @@ function mostrarMensaje(mensaje, tipo) {
     mensajeAlerta.className = "alert alert-" + tipo + " shadow-sm";
 }
 
+//Oculta el mensaje anterior
 function ocultarMensaje() {
     mensajeAlerta.className = "alert d-none";
 }
@@ -69,6 +70,7 @@ function formatearFechaHora(fechaHora) {
     return `${partes[2]}/${partes[1]}/${partes[0]} ${hora.slice(0, 5)}`;
 }
 
+//Crea una celda de la tabla con el texto indicado
 function crearCelda(texto) {
     const celda = document.createElement("td");
     celda.textContent = texto;
@@ -76,6 +78,7 @@ function crearCelda(texto) {
     return celda;
 }
 
+//Genera una fila por cada operación registrada, o un aviso si no hay ninguna
 function mostrarActividad(actividad) {
     cuerpoTablaActividad.replaceChildren();
 
@@ -103,6 +106,7 @@ function mostrarActividad(actividad) {
     }
 }
 
+//GET - Consulta la actividad con los filtros del formulario y la muestra en la tabla
 async function cargarActividad() {
     try {
         ocultarMensaje();

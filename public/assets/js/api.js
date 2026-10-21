@@ -50,6 +50,7 @@ function guardarSesionLocal(sesion) {
     sessionStorage.setItem(CLAVE_ROL, sesion.rol);
 }
 
+//Borra los datos de sesión guardados en el navegador (cédula, rol y token CSRF)
 function borrarSesionLocal() {
     sessionStorage.removeItem(CLAVE_CSRF);
     sessionStorage.removeItem(CLAVE_CEDULA);

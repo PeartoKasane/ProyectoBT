@@ -364,7 +364,7 @@ async function actualizarTabla() {
     cuerpoTablaTickets.replaceChildren();
 
     try {
-        // GET ?ruta=tickets
+        //GET ?ruta=tickets
         const tickets = await obtenerTickets();
 
         if (tickets.length === 0) {
@@ -537,7 +537,7 @@ async function abrirDetalleTicket(id) {
     ocultarMensaje();
 
     try {
-        // GET ?ruta=tickets&id={id}
+        //GET ?ruta=tickets&id={id}
         const detalle = await obtenerTicket(id);
 
         idTicketAbierto = detalle.ticket.id;
@@ -581,7 +581,7 @@ async function actualizarEstado() {
     ocultarMensajeDetalle();
 
     try {
-        // PATCH ?ruta=tickets {id, estado}
+        //PATCH ?ruta=tickets {id, estado}
         const resultado = await cambiarEstadoTicket(idTicketAbierto, selectEstado.value);
         await recargarDetalle(resultado.mensaje);
     } catch (error) {
@@ -594,7 +594,7 @@ async function asignarResponsable() {
     ocultarMensajeDetalle();
 
     try {
-        // PATCH ?ruta=tickets {id, cedulaAsignado}
+        //PATCH ?ruta=tickets {id, cedulaAsignado}
         const resultado = await asignarTicket(idTicketAbierto, selectTecnico.value);
         await recargarDetalle(resultado.mensaje);
     } catch (error) {
@@ -654,9 +654,11 @@ async function gestionarComentario(eventoFormulario) {
     try {
         let resultado;
 
-        if (idComentarioEnEdicion === null) { // POST ?ruta=tickets&recurso=comentarios
+        //POST ?ruta=tickets&recurso=comentarios
+        if (idComentarioEnEdicion === null) {
             resultado = await agregarComentario(idTicketAbierto, texto);
-        } else { // PUT ?ruta=tickets&recurso=comentarios
+        } else {
+            //PUT ?ruta=tickets&recurso=comentarios
             resultado = await modificarComentario(idComentarioEnEdicion, texto);
         }
 
@@ -678,7 +680,7 @@ async function eliminarComentarioTicket(idComentario) {
     ocultarMensajeDetalle();
 
     try {
-        // DELETE ?ruta=tickets&recurso=comentarios
+        //DELETE ?ruta=tickets&recurso=comentarios
         const resultado = await eliminarComentarioApi(idComentario);
 
         //Si se estaba editando justo ese comentario, se descarta la edición
@@ -714,7 +716,7 @@ function cerrarGestionarTicket() {
 
 //Carga las salas del inventario en el selector
 async function cargarSalas() {
-    // GET ?ruta=inventario
+    //GET ?ruta=inventario
     salasInventario = await obtenerSalas();
 
     entradaSala.replaceChildren();
@@ -838,7 +840,7 @@ async function abrirModificarTicket(id) {
     ocultarMensaje();
 
     try {
-        // GET ?ruta=tickets&id={id} y GET ?ruta=inventario
+        //GET ?ruta=tickets&id={id} y GET ?ruta=inventario
         const detalle = await obtenerTicket(id);
         await cargarSalas();
 
@@ -919,9 +921,11 @@ async function gestionarTicket(eventoFormulario) {
 
         let resultado;
 
-        if (ticketEnEdicion === null) { // POST ?ruta=tickets
+        //POST ?ruta=tickets
+        if (ticketEnEdicion === null) {
             resultado = await altaTicket(ticket);
-        } else { // PUT ?ruta=tickets
+        } else {
+            //PUT ?ruta=tickets
             resultado = await modificarTicket(ticket);
         }
 
@@ -959,5 +963,5 @@ formularioComentario.addEventListener("submit", gestionarComentario);
 btnCancelarComentario.addEventListener("click", terminarEdicionComentario);
 elementoModal.addEventListener("hidden.bs.modal", limpiarEstadoDetalle);
 
-// GET ?ruta=tickets
+//GET ?ruta=tickets
 actualizarTabla();

@@ -42,6 +42,7 @@ async function loguear(cedula, clave) {
     return await solicitarApi("login", { metodo: "POST", cuerpo: { cedula: cedula, clave: clave } });
 }
 
+//POST - Envía las credenciales, guarda los datos de sesión y deriva al panel del rol
 async function gestionarLogin(eventoFormulario) {
     eventoFormulario.preventDefault();
     ocultarError();

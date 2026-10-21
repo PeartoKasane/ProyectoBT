@@ -334,7 +334,7 @@ async function actualizarInventario() {
     salasActuales = [];
 
     try {
-        // GET index.php?ruta=inventario
+        //GET index.php?ruta=inventario
         const salas = await obtenerInventario();
         salasActuales = salas;
 
@@ -409,7 +409,7 @@ async function abrirHistorialEquipo(idEquipo) {
     ocultarMensaje();
 
     try {
-        // GET index.php?ruta=inventario&idEquipo={idEquipo}
+        //GET index.php?ruta=inventario&idEquipo={idEquipo}
         const detalle = await obtenerEquipo(idEquipo);
 
         modalTitulo.textContent = `Historial del equipo N° ${detalle.equipo.numero}`;
@@ -450,11 +450,13 @@ function abrirModalSala(sala) {
     modalGestionarSala.show();
 }
 
+//Abre el modal para registrar una nueva sala
 function abrirAltaSala() {
     ocultarMensaje();
     abrirModalSala(null);
 }
 
+//Abre el modal con los datos actuales de la sala para poder modificarlos
 function abrirModificarSala(sala) {
     ocultarMensaje();
     abrirModalSala(sala);
@@ -495,10 +497,10 @@ async function confirmarSala(evento) {
         let resultado;
 
         if (salaEnEdicion === null) {
-            // POST index.php?ruta=inventario&recurso=salas
+            //POST index.php?ruta=inventario&recurso=salas
             resultado = await altaSala(sala);
         } else {
-            // PUT index.php?ruta=inventario&recurso=salas
+            //PUT index.php?ruta=inventario&recurso=salas
             resultado = await modificarSala({ id: salaEnEdicion.id, ...sala });
         }
 
@@ -521,7 +523,7 @@ async function eliminarSala(sala) {
     ocultarMensaje();
 
     try {
-        // DELETE index.php?ruta=inventario&recurso=salas
+        //DELETE index.php?ruta=inventario&recurso=salas
         const resultado = await bajaSala(sala.id);
 
         mostrarMensaje(resultado.mensaje, "success");
@@ -646,21 +648,21 @@ async function confirmarEquipo(evento) {
         let mensaje;
 
         if (equipoEnEdicion === null) {
-            // POST index.php?ruta=inventario&recurso=equipos
+            //POST index.php?ruta=inventario&recurso=equipos
             const resultado = await altaEquipo({ numero: datos.numero, idSala: datos.idSala, estado: datos.estado });
             mensaje = resultado.mensaje;
 
             //El alta no recibe la incidencia: si nace con ese estado se completa con una modificación
             if (datos.estado === "Incidencia") {
                 try {
-                    // PUT index.php?ruta=inventario&recurso=equipos
+                    //PUT index.php?ruta=inventario&recurso=equipos
                     await modificarEquipo({ id: resultado.id, estado: datos.estado, incidencia: datos.incidencia });
                 } catch (error) {
                     mensaje += ", pero no se pudo guardar la descripción de la incidencia: " + error.message;
                 }
             }
         } else {
-            // PUT index.php?ruta=inventario&recurso=equipos
+            //PUT index.php?ruta=inventario&recurso=equipos
             const resultado = await modificarEquipo({ id: equipoEnEdicion.id, estado: datos.estado, incidencia: datos.incidencia });
             mensaje = resultado.mensaje;
         }
@@ -684,7 +686,7 @@ async function eliminarEquipo(equipo) {
     ocultarMensaje();
 
     try {
-        // DELETE index.php?ruta=inventario&recurso=equipos
+        //DELETE index.php?ruta=inventario&recurso=equipos
         const resultado = await bajaEquipo(equipo.id);
 
         mostrarMensaje(resultado.mensaje, "success");
@@ -707,5 +709,5 @@ if (esAdministrador) {
     entradaEstadoEquipo.addEventListener("change", actualizarCajaIncidencia);
 }
 
-// GET index.php?ruta=inventario
+//GET index.php?ruta=inventario
 actualizarInventario();

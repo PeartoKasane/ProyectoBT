@@ -58,6 +58,7 @@ function mostrarMensajeEn(elemento, mensaje, tipo) {
     elemento.className = "alert alert-" + tipo + " shadow-sm";
 }
 
+//Oculta el mensaje de un elemento de alerta
 function ocultarMensajeEn(elemento) {
     elemento.className = "alert d-none";
 }
@@ -67,6 +68,7 @@ function mostrarMensaje(mensaje, tipo) {
     mostrarMensajeEn(mensajeAlerta, mensaje, tipo);
 }
 
+//Oculta el mensaje anterior de la página
 function ocultarMensaje() {
     ocultarMensajeEn(mensajeAlerta);
 }
