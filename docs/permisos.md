@@ -27,6 +27,7 @@ Convenciones: **X** = permitido; **(propio)** = solo sobre sus propios registros
 | Leer salas, equipos e historial de un equipo | X | X | X | X |
 | Alta, modificación y baja de salas | X | - | - | - |
 | Alta, modificación de estado y baja de equipos | X | - | - | - |
+| Corregir o eliminar un evento del historial de un equipo (PUT / DELETE `recurso=historial`) | X | - | - | - |
 
 ### 2.3 Tickets (`?ruta=tickets`)
 
@@ -57,6 +58,7 @@ Convenciones: **X** = permitido; **(propio)** = solo sobre sus propios registros
 | Comentar | X | X | (propio) | X |
 | Editar / eliminar comentario | X (cualquiera) | autor | autor | autor |
 | Ver préstamo activo asociado (en el detalle) | X | - | - | X |
+| Corregir o eliminar un evento del historial (PUT / DELETE `recurso=historial`) | X | - | - | - |
 
 Restricciones adicionales: no se edita una solicitud con préstamo activo (409) ni se elimina una con préstamos registrados (409).
 
@@ -92,7 +94,15 @@ Reportes es solo lectura (cualquier método distinto de GET responde 405).
 
 ### 2.8 Registro de actividad (`?ruta=actividad`)
 
-Solo administrador (`Sesion::verificarRol("administrador")`); los demás roles reciben 401 sin sesión o 403 "Acceso denegado: rol incorrecto". Esta ruta se incorpora en paralelo a este documento; verifique que exista en `app/rutas/api.php`.
+Solo administrador (`Sesion::verificarRol("administrador")`); los demás roles reciben 401 sin sesión o 403 "Acceso denegado: rol incorrecto".
+
+| Operación | Admin | Dirección | Docente | Técnico |
+|---|---|---|---|---|
+| Consultar (GET) | X | - | - | - |
+| Corregir el detalle de un registro (PUT) | X | - | - | - |
+| Eliminar un registro (DELETE) | X | - | - | - |
+
+PUT y DELETE exigen token CSRF, igual que el resto de las operaciones que modifican datos.
 
 ## 3. Administración de usuarios: roles y habilitación (RF34, RF36, RF38)
 

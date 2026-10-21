@@ -55,6 +55,7 @@ Abreviaturas de relaciones (además HS = HISTORIAL_SOLICITUD, AC = ACTIVIDAD): U
 
 ### Actividad (`ActividadDAO`)
 - `INSERT INTO ACTIVIDAD` (`registrar`): una fila por cada operación POST/PUT/PATCH/DELETE completada con éxito, escrita al terminar la petición.
+- `UPDATE ACTIVIDAD SET detalle` (`modificarDetalle`) · `DELETE FROM ACTIVIDAD` (`eliminar`): corrección y baja de registros, solo administrador.
 
 ### Préstamos (`PrestamoDAO`)
 - **Q24** `listarPrestamos` / `listarPrestamo` / `listarPrestamoActivoPorSolicitud`: listado, detalle y préstamo activo de una solicitud.
@@ -75,6 +76,10 @@ Abreviaturas de relaciones (además HS = HISTORIAL_SOLICITUD, AC = ACTIVIDAD): U
 ### Historial y actividad (`SolicitudDAO`, `ActividadDAO`)
 - **Q36** `listarHistorial`: acciones realizadas sobre una solicitud con el usuario que las hizo (RF31).
 - **Q37** `ActividadDAO::listar`: operaciones registradas en un rango de fechas, con filtro opcional por usuario (RNF4).
+- **Q38** `InventarioDAO::listarEventoHistorial` / `SolicitudDAO::listarEventoHistorial`: un evento del historial por id (lo usa el administrador antes de corregirlo o eliminarlo).
+- **Q39** `ActividadDAO::listarRegistro`: un registro de actividad por id (mismo uso).
+
+Los archivos de `baseDeDatos/DQL/` contienen estas mismas consultas, tal como las ejecutan los DAO. Para simplificarlas se usa `IF(x IS NOT NULL, TRUE, FALSE)` en las marcas de rol, `GROUP BY` con todas las columnas no agregadas y `AVG()` directo (ignora los NULL, no necesita `CASE`). El `CASE` solo se mantiene en el texto del rol (Q2 y Q3), que tiene cuatro ramas.
 
 ---
 
@@ -172,11 +177,15 @@ Resultado = límite 10(τ<sub>totalIncidencias ↓</sub>(γ<sub>E.id, E.numero, 
 τ<sub>totalTickets ↓</sub>(γ<sub>S.id, S.tipo, S.numero; COUNT(*)→totalTickets</sub>(σ<sub>T.fecha ∈ [d, h]</sub>(T ⋈<sub>T.idSala = S.id</sub> S)))
 
 **Q33 `obtenerMetricasPrestamos`**
-γ<sub>∅; COUNT(*)→total, SUM(estado = 'Activo')→activos, SUM(estado = 'Finalizado')→finalizados, AVG(horas(fechaHoraFin − fechaHoraInicio))→promedioHoras</sub>(σ<sub>fecha(fechaHoraInicio) ∈ [d, h]</sub>(P))
+γ<sub>∅; COUNT(*)→total, SUM(estado = 'Activo')→activos, SUM(estado = 'Finalizado')→finalizados, AVG(horas(fechaHoraFin − fechaHoraInicio))→promedioHoras</sub>(σ<sub>fecha(fechaHoraInicio) ∈ [d, h]</sub>(P)). Los préstamos sin devolver (`fechaHoraFin` NULL) no entran en el promedio.
 
 **Q34 `listarEquiposMasPrestados`**
 R = σ<sub>fecha(P.fechaHoraInicio) ∈ [d, h]</sub>(PE ⋈<sub>equipo_id = E.id</sub> E ⋈<sub>E.idSala = S.id</sub> S ⋈<sub>prestamo_id = P.id</sub> P)
 Resultado = límite 10(τ<sub>totalPrestamos ↓</sub>(γ<sub>E.id, E.numero, S.tipo, S.numero; COUNT(*)→totalPrestamos</sub>(R)))
+
+**Q38 `listarEventoHistorial`**: π<sub>id, equipo_id | solicitud_id, accion, detalle</sub>(σ<sub>id = h</sub>(H | HS))
+
+**Q39 `ActividadDAO::listarRegistro`**: π<sub>id, cedula, metodo, ruta, recurso, detalle, estado, fecha</sub>(σ<sub>id = a</sub>(AC))
 
 **Q36 `listarHistorial`**
 τ<sub>fecha ↓, id ↓</sub>(π<sub>HS.id, accion, detalle, fecha, U.nombre, U.apellido</sub>(σ<sub>HS.solicitud_id = s</sub>(HS) ⟕<sub>HS.cedula = U.cedula</sub> U))   (HS = HISTORIAL_SOLICITUD)
@@ -202,6 +211,7 @@ Resultado = límite n(τ<sub>fecha ↓, id ↓</sub>(π<sub>AC.id, AC.cedula, U.
 - `INSERT INTO EQUIPO` + `INSERT INTO HISTORIAL_EQUIPO ('Alta')` (`registrarEquipo`).
 - `UPDATE EQUIPO SET estado, incidencia` + `INSERT INTO HISTORIAL_EQUIPO ('Modificación')` (`modificarEquipo`).
 - `DELETE FROM EQUIPO` (`eliminarEquipo`).
+- `UPDATE HISTORIAL_EQUIPO SET accion, detalle` (`modificarEventoHistorial`) · `DELETE FROM HISTORIAL_EQUIPO` (`eliminarEventoHistorial`): corrección y baja de la bitácora, solo administrador.
 
 ### Tickets (`TicketDAO`)
 - `INSERT INTO TICKET`, `INSERT INTO TICKET_EQUIPO` (uno por equipo), `INSERT INTO HISTORIAL_EQUIPO ('Uso en ticket')` por cada equipo utilizado y `UPDATE TICKET SET prioridad` (`registrarTicket`).
@@ -214,6 +224,7 @@ Resultado = límite n(τ<sub>fecha ↓, id ↓</sub>(π<sub>AC.id, AC.cedula, U.
 - `INSERT INTO SOLICITUD` + `INSERT INTO HISTORIAL_SOLICITUD ('Creación')` (`registrarSolicitud`) · `UPDATE SOLICITUD SET tipo, idSala, programa, detalle, fecha, hora` (`modificarSolicitud`).
 - `UPDATE SOLICITUD SET estado` + `INSERT INTO HISTORIAL_SOLICITUD ('Estado')` (`cambiarEstado`) · `UPDATE SOLICITUD SET cedulaAsignado, estado` + `INSERT INTO HISTORIAL_SOLICITUD ('Asignación')` (`asignarResponsable`).
 - `DELETE FROM SOLICITUD` (`eliminarSolicitud`).
+- `UPDATE HISTORIAL_SOLICITUD SET accion, detalle` (`modificarEventoHistorial`) · `DELETE FROM HISTORIAL_SOLICITUD` (`eliminarEventoHistorial`): corrección y baja de la bitácora, solo administrador.
 - `INSERT INTO SOLICITUD_COMENTARIO` · `UPDATE SOLICITUD_COMENTARIO SET comentario` · `DELETE FROM SOLICITUD_COMENTARIO`.
 
 ### Préstamos (`PrestamoDAO`)
@@ -232,7 +243,7 @@ Resultado = límite n(τ<sub>fecha ↓, id ↓</sub>(π<sub>AC.id, AC.cedula, U.
 | ADMINISTRADOR, DOCENTE, DIRECCION, TECNICO | ✔ | ✔ | ✔ | ✔ | `usuarios` (el rol se gestiona con el usuario) |
 | SALA | ✔ | ✔ | ✔ | ✔ | `inventario?recurso=salas` |
 | EQUIPO | ✔ | ✔ | ✔ | ✔ | `inventario?recurso=equipos` |
-| HISTORIAL_EQUIPO | ✔ (automático) | ✔ | no aplica | no aplica | `inventario?idEquipo=`. Es una bitácora de auditoría: se escribe sola en cada alta o modificación de equipo, uso en un ticket, préstamo y devolución y no se edita ni borra a propósito. Se elimina en cascada con su equipo. |
+| HISTORIAL_EQUIPO | ✔ (automático) | ✔ | ✔ (`accion`, `detalle`) | ✔ | `inventario?idEquipo=` (lectura); `inventario?recurso=historial` (PUT, DELETE, solo administrador). Bitácora de auditoría: se escribe sola en cada alta o modificación de equipo, uso en un ticket, préstamo y devolución; solo el administrador puede corregirla o borrarla. También se elimina en cascada con su equipo. |
 | TICKET | ✔ | ✔ | ✔ | ✔ | `tickets` |
 | TICKET_EQUIPO | ✔ | ✔ | ✔ | ✔ | `tickets` (se gestiona con el ticket) |
 | TICKET_COMENTARIO | ✔ | ✔ | ✔ | ✔ | `tickets?recurso=comentarios` |
@@ -240,8 +251,10 @@ Resultado = límite n(τ<sub>fecha ↓, id ↓</sub>(π<sub>AC.id, AC.cedula, U.
 | SOLICITUD_COMENTARIO | ✔ | ✔ | ✔ | ✔ | `solicitudes?recurso=comentarios` |
 | PRESTAMO | ✔ | ✔ | ✔ | ✔ | `prestamos` |
 | PRESTAMO_EQUIPO | ✔ | ✔ | ✔ (`noSeUso`) | ✔ (en cascada) | `prestamos` (se gestiona con el préstamo) |
-| HISTORIAL_SOLICITUD | ✔ (automático) | ✔ | no aplica | no aplica | `solicitudes?id=` (campo `historial`). Bitácora: se escribe sola; se elimina en cascada con su solicitud. |
-| ACTIVIDAD | ✔ (automático) | ✔ | no aplica | no aplica | `actividad` (solo administrador). Bitácora de auditoría (RNF4). |
+| HISTORIAL_SOLICITUD | ✔ (automático) | ✔ | ✔ (`accion`, `detalle`) | ✔ | `solicitudes?id=` (campo `historial`, lectura); `solicitudes?recurso=historial` (PUT, DELETE, solo administrador). Bitácora: se escribe sola; solo el administrador puede corregirla o borrarla. También se elimina en cascada con su solicitud. |
+| ACTIVIDAD | ✔ (automático) | ✔ | ✔ (`detalle`) | ✔ | `actividad` (GET, PUT, DELETE, solo administrador). Bitácora de auditoría (RNF4): se escribe sola; el usuario, la operación y la fecha nunca se modifican. |
+
+En las tres bitácoras el Update solo admite corregir texto (`accion` y `detalle`) para no alterar quién hizo cada operación ni cuándo, y toda corrección o baja queda registrada a su vez en `ACTIVIDAD`.
 
 ## 5. Seguridad de la persistencia
 

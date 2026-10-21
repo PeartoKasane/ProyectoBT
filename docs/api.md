@@ -31,12 +31,14 @@ Todo el backend se expone por un único entrypoint, `public/index.php`, que reci
 | `logout` | POST | sesión | Cierra la sesión (RF37). Con `?recurso=salida` lo envía solo el navegador (`pagehide`) al abandonar la página: libera la sesión en la base y, si no llega otra petición en 30 s, la sesión PHP queda vencida |
 | `sesion` | GET | sesión | Datos del usuario logueado: `cedula, nombre, apellido, email, rol` |
 | `usuarios` | GET, POST, PUT, PATCH, DELETE | administrador | Ver la sección de usuarios del documento anterior: `?cedula=` para consultar uno |
-| `inventario` | GET, POST, PUT, DELETE | lectura: todos; escritura: administrador | `?idEquipo=`; `?recurso=salas\|equipos` en POST, PUT y DELETE |
+| `inventario` | GET, POST, PUT, DELETE | lectura: todos; escritura: administrador | `?idEquipo=`; `?recurso=salas\|equipos` en POST, PUT y DELETE; `?recurso=historial` en PUT y DELETE (`{id, accion, detalle}` / `{id}`) |
 | `tickets` | GET, POST, PUT, PATCH, DELETE | según rol | `?id=`; `?recurso=comentarios` para comentarios; PATCH = estado o asignación |
-| `solicitudes` | GET, POST, PUT, PATCH, DELETE | los 4 roles (el docente solo ve las suyas) | `?id=` (el detalle incluye `comentarios` e `historial`), `?recurso=salas\|comentarios`; estado y asignación: administrador y técnico |
+| `solicitudes` | GET, POST, PUT, PATCH, DELETE | los 4 roles (el docente solo ve las suyas) | `?id=` (el detalle incluye `comentarios` e `historial`), `?recurso=salas\|comentarios`; estado y asignación: administrador y técnico; `?recurso=historial` en PUT y DELETE solo administrador (`{id, accion, detalle}` / `{id}`) |
 | `prestamos` | GET, POST, PUT, PATCH, DELETE | administrador, técnico, dirección (alta y devolución: administrador y técnico) | `?id=`, `?recurso=equiposDisponibles&idSolicitud=`; devolución: `{id, noSeUso:[...]}` |
-| `actividad` | GET | administrador | Registro de actividad (RNF4): `?desde=&hasta=&cedula=&limite=` |
+| `actividad` | GET, PUT, DELETE | administrador | Registro de actividad (RNF4): GET `?desde=&hasta=&cedula=&limite=`; PUT `{id, detalle}` corrige el detalle; DELETE `{id}` elimina el registro |
 | `reportes` | GET | administrador, técnico, dirección | `?desde=&hasta=` (AAAA-MM-DD); `?recurso=personal` solo dirección |
+
+Las tres bitácoras (`HISTORIAL_EQUIPO`, `HISTORIAL_SOLICITUD` y `ACTIVIDAD`) se escriben solas, pero el administrador puede corregirlas (PUT, solo `accion` y `detalle`; la fecha y el usuario nunca cambian) o eliminarlas (DELETE). Estas dos operaciones también quedan registradas en `ACTIVIDAD`.
 
 Las consultas, el álgebra relacional, el DML y la cobertura CRUD por tabla están en `persistencia.md`.
 
