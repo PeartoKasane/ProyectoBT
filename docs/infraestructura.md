@@ -2,7 +2,7 @@
 
 Guía de configuración del servidor donde se aloja SGRSI. Cubre RNF5 (firewall), RNF6 (respaldos), RNF7 (SSH), RNF17 y RNF18 (disponibilidad), RNF19 (arranque automático), RNF25 (Debian) y RNF26 (HTTP/HTTPS en la red institucional).
 
-> **Alcance.** Todo lo de este documento son pasos **a ejecutar en el servidor**, como `root` (o con `sudo`). **Nada de esto está implementado en el código del repositorio**: el repositorio solo contiene la aplicación (`app/`, `public/`, `config/`, `baseDeDatos/`). Los comandos se probaron como guía para Debian 12 "bookworm" (PHP 8.2, MariaDB 10.11, Apache 2.4); en otras versiones cambian los números de versión de los paquetes.
+> **Alcance.** Todo lo de este documento son pasos **a ejecutar en el servidor**, como `root` (o con `sudo`). **Nada de esto está implementado en el código del repositorio**: el repositorio solo contiene la aplicación (`app/`, `public/`, `config/`, `baseDeDatos/`). Los comandos se probaron como guía para Debian 12 "bookworm" (PHP 8.2, MySQL 8.4 LTS, Apache 2.4); en otras versiones cambian los números de versión de los paquetes.
 
 Valores de ejemplo que debe ajustar:
 
@@ -12,14 +12,19 @@ Valores de ejemplo que debe ajustar:
 | `/var/www/sgrsi` | | Carpeta donde se despliega el proyecto |
 | `sgrsi.institucion.local` | | Nombre del servidor en la red interna |
 
-Requisitos de la aplicación (según el repositorio): PHP 8.0 o superior (usa `match` y tipos `mixed`) con las extensiones PDO MySQL y `mbstring`, MySQL/MariaDB, y Composer para `vlucas/phpdotenv`. La base se llama `PeartoS.A` (con punto: en SQL va entre comillas invertidas).
+Requisitos de la aplicación (según el repositorio): PHP 8.0 o superior (usa `match` y tipos `mixed`) con las extensiones PDO MySQL y `mbstring`, MySQL, y Composer para `vlucas/phpdotenv`. La base se llama `PeartoS.A` (con punto: en SQL va entre comillas invertidas).
 
 ## 1. Paquetes e instalación de la aplicación
 
 ```bash
 # EJECUTAR EN EL SERVIDOR
 apt update && apt full-upgrade -y
-apt install -y apache2 mariadb-server php libapache2-mod-php php-mysql php-mbstring php-xml unzip git composer ufw
+apt install -y apache2 php libapache2-mod-php php-mysql php-mbstring php-xml unzip git composer ufw wget lsb-release gnupg
+
+# MySQL no está en los repositorios de Debian: se agrega el repositorio oficial de MySQL (elegir "MySQL Server & Cluster" > mysql-8.4-lts)
+wget https://dev.mysql.com/get/mysql-apt-config_0.8.33-1_all.deb    # ajuste el nombre al paquete vigente en https://dev.mysql.com/downloads/repo/apt/
+dpkg -i mysql-apt-config_*_all.deb
+apt update && apt install -y mysql-server
 
 # Despliegue (ajuste el origen del repositorio)
 git clone <URL_DEL_REPOSITORIO> /var/www/sgrsi
@@ -40,7 +45,7 @@ dpkg-reconfigure -plow unattended-upgrades
 mysql_secure_installation          # root solo por socket, sin usuarios anónimos ni base de prueba
 ```
 
-Verifique que MariaDB escuche **solo en local** (MySQL solo local, RNF5). En Debian ya es el valor por defecto; confírmelo:
+Verifique que MySQL escuche **solo en local** (MySQL solo local, RNF5). En Debian ya es el valor por defecto; confírmelo:
 
 ```bash
 grep -rn "bind-address" /etc/mysql/ 
@@ -48,7 +53,7 @@ grep -rn "bind-address" /etc/mysql/
 ss -tlnp | grep 3306               # Debe mostrar 127.0.0.1:3306, nunca 0.0.0.0 ni [::]
 ```
 
-Si hiciera falta, cree `/etc/mysql/mariadb.conf.d/99-sgrsi.cnf`:
+Si hiciera falta, cree `/etc/mysql/mysql.conf.d/99-sgrsi.cnf`:
 
 ```ini
 [mysqld]
@@ -60,7 +65,7 @@ Cree la base, cargue el esquema y un usuario propio de la aplicación (el `.env.
 
 ```bash
 # EJECUTAR EN EL SERVIDOR
-mysql < /var/www/sgrsi/baseDeDatos/schema.sql    # crea `PeartoS.A`, tablas, triggers y datos de prueba
+mysql < /var/www/sgrsi/baseDeDatos/schema.sql    # crea `PeartoS.A`, tablas y datos de prueba
 mysql <<'SQL'
 CREATE USER 'sgrsi'@'localhost' IDENTIFIED BY 'CAMBIAR_POR_UNA_CLAVE_LARGA';
 GRANT SELECT, INSERT, UPDATE, DELETE ON `PeartoS.A`.* TO 'sgrsi'@'localhost';
@@ -259,7 +264,7 @@ Mantenga abierta la sesión actual y pruebe un ingreso nuevo desde otra terminal
 
 ## 6. Respaldos periódicos de `PeartoS.A` (RNF6)
 
-`mysqldump` + cron, con rotación. El script corre como `root`, que en Debian/MariaDB se autentica por socket sin contraseña (no se guardan credenciales en el script). Se incluyen triggers y rutinas (el esquema usa el procedimiento `sp_actualizar_rol` y triggers de roles).
+`mysqldump` + cron, con rotación. El script corre como `root`, que en Debian/MySQL se autentica por socket sin contraseña (no se guardan credenciales en el script). El esquema actual no define triggers ni procedimientos (el rol se deduce de las tablas de rol), pero `--routines --triggers --events` se mantiene por si más adelante se agregan.
 
 ```bash
 # EJECUTAR EN EL SERVIDOR
@@ -308,7 +313,7 @@ El volcado trae `CREATE DATABASE` y `USE`, y reemplaza las tablas existentes (`D
 
 ```bash
 # EJECUTAR EN EL SERVIDOR
-systemctl enable --now apache2 mariadb
+systemctl enable --now apache2 mysql
 systemctl enable ufw          # si usa ufw; con nftables: systemctl enable nftables
 systemctl enable ssh cron
 ```
@@ -334,14 +339,14 @@ RestartSec=5s
 Comprobaciones, incluido un reinicio completo:
 
 ```bash
-systemctl is-enabled apache2 mariadb ssh cron       # todos "enabled"
+systemctl is-enabled apache2 mysql ssh cron       # todos "enabled"
 systemctl --failed
 reboot
 # Tras reiniciar:
-systemctl is-active apache2 mariadb && ss -tlnp | grep -E ':(22|80|443|3306)\s'
+systemctl is-active apache2 mysql && ss -tlnp | grep -E ':(22|80|443|3306)\s'
 ```
 
-Disponibilidad (RNF17): programe las actualizaciones que requieran reinicio y las tareas de mantenimiento fuera del horario operativo; el respaldo ya corre a las 02:30. Revise con regularidad `/var/log/apache2/sgrsi_error.log`, `journalctl -u mariadb` y el espacio en disco (`df -h`), en especial `/var/backups/sgrsi`.
+Disponibilidad (RNF17): programe las actualizaciones que requieran reinicio y las tareas de mantenimiento fuera del horario operativo; el respaldo ya corre a las 02:30. Revise con regularidad `/var/log/apache2/sgrsi_error.log`, `journalctl -u mysql` y el espacio en disco (`df -h`), en especial `/var/backups/sgrsi`.
 
 ## 8. Lista de verificación final
 
@@ -351,6 +356,6 @@ Disponibilidad (RNF17): programe las actualizaciones que requieran reinicio y la
 | RNF6 respaldos | Existe `/etc/cron.d/sgrsi-respaldo` y hay archivos recientes en `/var/backups/sgrsi` |
 | RNF7 SSH | `sshd -T \| grep -E 'permitrootlogin\|passwordauthentication'` devuelve `no` y `no` |
 | RNF17, RNF18 | Reinicio automático de Apache configurado; actualizaciones de seguridad automáticas activas |
-| RNF19 arranque | `systemctl is-enabled apache2 mariadb` = `enabled`; el sistema responde tras `reboot` |
+| RNF19 arranque | `systemctl is-enabled apache2 mysql` = `enabled`; el sistema responde tras `reboot` |
 | RNF25 Debian | `cat /etc/os-release` muestra Debian GNU/Linux; el login carga y se puede iniciar sesión |
 | RNF26 HTTP/HTTPS | `https://sgrsi.institucion.local/paginas/login.html` responde desde un equipo de la red; `/.env` da 404 |
