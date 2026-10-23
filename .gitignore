@@ -1,0 +1,47 @@
+# Dependencias (se regeneran con `composer install`)
+/vendor/
+
+# Variables de entorno (credenciales). Se versiona solo .env.example
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+logs/
+error_log
+php_errors.log
+
+# Archivos de Composer locales
+composer.phar
+auth.json
+
+# Cache / herramientas PHP
+.phpunit.result.cache
+.php-cs-fixer.cache
+.phpunit.cache/
+.phpstan.cache/
+
+# Subidas / temporales / backups
+/storage/
+/uploads/
+/tmp/
+*.bak
+*.swp
+*~
+*.sql.gz
+*.dump
+
+# IDEs y editores
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+.project
+.settings/
+.buildpath
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+desktop.ini
